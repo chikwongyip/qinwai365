@@ -1,17 +1,32 @@
 # coding:utf-8
 from requestAPI import RequestHandler
-from make_api_url import  make_api_url
+from make_api_url import make_api_url
+from api_params import Params
+import json
+import pandas as pd
 if __name__ == '__main__':
     # 以下是测试代码
     # get请求接口
-    url = 'https://api.apiopen.top/getJoke?page=1&count=2&type=video'
-    res = RequestHandler().get(url)
+    # url = 'https://openapi.waiqin365.com/api/store/v1/queryStore/'
+    # res = RequestHandler().get(url)
     # post请求接口
-    url2 = 'http://127.0.0.1:8000/user/login/'
-    payload = {
-        "username": "vivi",
-        "password": "123456"
+    # openid:5641776398931134667
+    # appkey:DMVtcNFzbZgFqK03_Y
+
+    url = 'https://openapi.waiqin365.com/api/store/v1/queryStore'
+    headers = {
+        "Content-Type": "application/json"
     }
-    res2 = RequestHandler().post(url2, json=payload)
-    print(res.json())
-    print(res2.json())
+    json_object = Params(1)
+    json_dict = json_object.__dict__
+    data = json.dumps(json_dict)
+    api_url = make_api_url(url, data, '5641776398931134667', 'DMVtcNFzbZgFqK03_Y')
+    res = RequestHandler().post(api_url, data=data, headers=headers)
+    result = json.loads(res.text)
+    response_data = result["response_data"]
+    df = pd.DataFrame(response_data)
+    print(df)
+    # df = pd.DataFrame(result)
+    # print(df)
+    # df = pd.read_json(result)
+    # print(df)

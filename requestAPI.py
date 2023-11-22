@@ -15,11 +15,12 @@ class RequestHandler:
 
     def post(self, url, **kwargs):
         """封装post请求"""
-        params = kwargs.get("params")
+        # params = kwargs.get("params")
+        headers = kwargs.get("headers")
         data = kwargs.get("data")
-        json = kwargs.get("json")
+        # json = kwargs.get("json")
         try:
-            result = requests.post(url, params=params, data=data, json=json)
+            result = requests.post(url, data=data, headers=headers)
             return result
         except Exception as e:
             print("post 请求错误： %s" % e)

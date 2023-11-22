@@ -1,8 +1,8 @@
 # coding:utf-8
-import time
-import datetime
-import datetime
+from datetime import datetime
 
 
 def generate_timestamp():
-    return datetime.datetime.now().timestamp() * 100000
+    now = datetime.now()
+    date_time = now.strftime("%Y%m%d%H%M%S")
+    return date_time
