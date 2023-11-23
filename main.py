@@ -22,10 +22,15 @@ if __name__ == '__main__':
     data = json.dumps(json_dict)
     api_url = make_api_url(url, data, '5641776398931134667', 'DMVtcNFzbZgFqK03_Y')
     res = RequestHandler().post(api_url, data=data, headers=headers)
-    result = json.loads(res.text)
-    response_data = result["response_data"]
-    df = pd.DataFrame(response_data)
+    if res.status_code == 200:
+        json_data = res.json()
+    else:
+        print(f"Error {res.status_code}: Unable to fetch data from the API")
+        exit()
+    df = pd.DataFrame(json_data)
     print(df)
+    # df = pd.read_json(res.text)
+    # print(df.to_string())
     # df = pd.DataFrame(result)
     # print(df)
     # df = pd.read_json(result)
