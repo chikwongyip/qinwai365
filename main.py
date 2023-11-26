@@ -23,12 +23,16 @@ if __name__ == '__main__':
     api_url = make_api_url(url, data, '5641776398931134667', 'DMVtcNFzbZgFqK03_Y')
     res = RequestHandler().post(api_url, data=data, headers=headers)
     if res.status_code == 200:
-        json_data = res.json()
+        dictr = res.json()
     else:
         print(f"Error {res.status_code}: Unable to fetch data from the API")
         exit()
-    df = pd.DataFrame(json_data)
-    print(df)
+
+    result = json.loads(dictr["response_data"])
+    print(type(result))
+    # with open("text.txt", "w") as file:
+    #     file.write(result)
+
     # df = pd.read_json(res.text)
     # print(df.to_string())
     # df = pd.DataFrame(result)
