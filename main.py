@@ -17,19 +17,22 @@ if __name__ == '__main__':
     headers = {
         "Content-Type": "application/json"
     }
-    json_object = Params(1)
-    json_dict = json_object.__dict__
-    data = json.dumps(json_dict)
-    api_url = make_api_url(url, data, '5641776398931134667', 'DMVtcNFzbZgFqK03_Y')
-    res = RequestHandler().post(api_url, data=data, headers=headers)
+    params = Params(1)
+    params_dict = params.__dict__
+    param_data = json.dumps(params_dict)
+    api_url = make_api_url(url, param_data, '5641776398931134667', 'DMVtcNFzbZgFqK03_Y')
+    res = RequestHandler().post(api_url, data=param_data, headers=headers)
     if res.status_code == 200:
-        dictr = res.json()
+        result = res.json()
     else:
         print(f"Error {res.status_code}: Unable to fetch data from the API")
         exit()
 
-    result = json.loads(dictr["response_data"])
-    print(type(result))
+    response_data = json.loads(result["response_data"])
+    df = pd.DataFrame(response_data)
+    print(df.loc[[0, 1]].dealers)
+
+
     # with open("text.txt", "w") as file:
     #     file.write(result)
 
