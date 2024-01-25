@@ -1,12 +1,10 @@
 from requestAPI import RequestHandler
 from make_api_url import make_api_url
-from api_params import Params
 import json
 
 
-def request_data(url, headers, page_number):
+def request_data(url, headers, params):
 
-    params = Params(page_number)
     params_dict = params.__dict__
     param_data = json.dumps(params_dict)
     api_url = make_api_url(url, param_data, '5641776398931134667', 'DMVtcNFzbZgFqK03_Y')
