@@ -1,5 +1,5 @@
 # coding:utf-8
-
+# 请求传参
 class Params:
     # 初始化
     def __init__(self, **kwargs):
@@ -7,4 +7,4 @@ class Params:
             self['key'] = kwargs[key]
 
 
-#   拜访记录传入参数
+
