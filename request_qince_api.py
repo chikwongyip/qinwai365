@@ -8,15 +8,15 @@ import random
 
 class Qince_API:
 
-    def __init__(self, path, openid, appkey, body: dict):
+    def __init__(self, path, config, body: dict):
         self.uri = 'https://openapi.waiqin365.com'
         self.url = self.uri + path
         self.headers = {"Content-Type": "application/json"}
-        self.openid = openid
-        self.appkey = appkey
+        self.openid = config.get('openid')
+        self.appkey = config.get('appkey')
         self.body = json.dumps(body)
 
-    def generate_timestamp():
+    def generate_timestamp(self):
         now = datetime.now()
         date_time = now.strftime("%Y%m%d%H%M%S")
         return date_time

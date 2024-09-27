@@ -2,16 +2,17 @@
 
 import snowflake.connector
 
-from config.config import snowflake_config
+# from config.config import snowflake_config
 
-def execute_snowflake_query(query):
+
+def execute_snowflake_query(query, config):
     try:
         # 建立连接
         conn = snowflake.connector.connect(
-            user=snowflake_config['user'],
-            password=snowflake_config['password'],
-            account=snowflake_config['account'],
-            database=snowflake_config['database']
+            user=config.get('user'),
+            password=config.get('password'),
+            account=config.get('account'),
+            database=config.get('database'),
         )
 
         # 创建游标
@@ -34,5 +35,3 @@ def execute_snowflake_query(query):
         # 关闭连接
         if conn:
             conn.close()
-
-

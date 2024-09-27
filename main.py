@@ -1,36 +1,43 @@
 # coding:utf-8
+from config.config import snowflake_prd_config
+from request_qince_api import Qince_API
+import datetime
+import time
 import json
-
-# import pandas as pd
-from query import execute_snowflake_query
-from requestData import request_data
-
+import pandas as pd
+from write_data import SaveData
 if __name__ == '__main__':
-    # sql_string = """
-    #     SELECT
-    #     ODS_T_DEALER.ID,
-    #     VALUE:dealer_ext_column::string as dealer_ext_column,
-    #     VALUE:dealer_ext_key::string as dealer_ext_key,
-    #     VALUE:dealer_ext_value::string as dealer_ext_value
-    # FROM
-    #     ODS.CRM.ODS_T_DEALER,
-    #     LATERAL FLATTEN(input => PARSE_JSON(VARIANT)) AS json_data
-    # WHERE ODS.CRM.ODS_T_DEALER.ID = '6745402878445459855'
-    # """
-    # result = execute_snowflake_query(sql_string)
-    # df = pd.DataFrame(result, columns=['ID', 'dealer_ext_column', 'dealer_ext_key', 'dealer_ext_value'])
-    # tmp = df.set_index(['ID']).stack()
-    # tmp2 = tmp.rename_axis(index=['dealer_ext_column', 'dealer_ext_key'])
-    # tmp2.name = 'dealer_ext_value'
-    # tmp2.reset_index()
-    # print(tmp2)
 
-    # url = 'https://openapi.waiqin365.com/api/store/v1/queryStore'
-    headers = {"Content-Type": "application/json"}
-    page_number = 1
-    response = request_data('https://openapi.waiqin365.com/api/store/v1/queryStore', headers=headers,
-                            page_number=page_number)
-    sql_string = f"""
-        INSERT INTO KETTLE_TEST.PUBLIC.ODS_T_STORE_JSON (PAGE_NUMBER, RESPONSE_DATA) VALUES ( ' {page_number}', '{json_string}')
-    """
-    result = execute_snowflake_query(sql_string)
+    path = '/api/store/v1/queryStore'
+    request_body = dict(page_number=1)
+    # 获取当前时间戳
+    extract_start_timestamp = int(time.time())
+    extract_start_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    res = Qince_API(path,
+                    snowflake_prd_config, request_body).request_data()
+
+    extract_end_timestamp = int(time.time())
+    extract_end_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    extract_condition = json.dumps(request_body)
+
+    extract_result = dict(
+        method=path,
+        method_mode='',
+        extract_start_timestamp=extract_start_timestamp,
+        extract_end_timestamp=extract_end_timestamp,
+        extract_start_date=extract_start_date,
+        extract_end_date=extract_end_date,
+        extract_condition=extract_condition,
+        page_no=request_body.get("page_number"),
+        cost_time=extract_end_timestamp - extract_start_timestamp,
+        extracted_result=res,
+        is_proccessed=False,
+        is_success=True
+    )
+    df = pd.DataFrame([extract_result])
+    # 将df column 转换成大写
+    df.columns = df.columns.str.upper()
+    SaveData(config=snowflake_prd_config).insert_data(
+        df, "ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
+    # print(df)
