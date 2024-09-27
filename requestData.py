@@ -7,7 +7,8 @@ def request_data(url, headers, params):
 
     params_dict = params.__dict__
     param_data = json.dumps(params_dict)
-    api_url = make_api_url(url, param_data, '5641776398931134667', 'DMVtcNFzbZgFqK03_Y')
+    api_url = make_api_url(
+        url, param_data, '5641776398931134667', 'DMVtcNFzbZgFqK03_Y')
     res = RequestHandler().post(api_url, data=param_data, headers=headers)
     if res.status_code == 200:
         result = json.loads(res.text)

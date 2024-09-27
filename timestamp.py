@@ -8,12 +8,15 @@ def generate_timestamp():
     date_time = now.strftime("%Y%m%d%H%M%S")
     return date_time
 
+
 def timestamp_to_datetime(ts):
     """
     时间戳转日
     """
-    dt = datetime.strptime(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(ts)))
+    dt = datetime.strptime(time.strftime(
+        '%Y-%m-%d %H:%M:%S', time.localtime(ts)))
     return dt
+
 
 def timestamp_to_datetime(timestamp):
     """
@@ -34,9 +37,10 @@ def datetime_to_date(dt):
     d = dt.strftime("%Y-%m-%d")
     return d
 
+
 def datetimestr_to_datetime(str_time):
     """
     日期转字符串
     """
-    datetime = datetime.strptime(str_time,"%Y-%m-%d %H:%M:%S")
+    datetime = datetime.strptime(str_time, "%Y-%m-%d %H:%M:%S")
     return datetime
