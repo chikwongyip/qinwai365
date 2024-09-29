@@ -4,15 +4,18 @@ from snowflake.connector.pandas_tools import write_pandas
 
 
 class SaveData:
-    def __init__(self, config):
+    def __init__(self, config, data):
         self.conn = snowflake.connector.connect(
             user=config.get('user'), password=config.get('password'), account=config.get('account'))
 
-    def insert_data(self, df, table):
+        self.data = data
+        self.data.columns = self.data.columns.str.upper()
+
+    def insert_data(self, table):
         database, schema, table_name = table.split(".")
         write_pandas(
             conn=self.conn,
-            df=df,
+            df=self.data,
             overwrite=False,
             table_name=table_name,
             database=database,
