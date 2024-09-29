@@ -9,7 +9,7 @@ create or replace table ods.crm.ods_t_crm_extract_original_data (
     extract_condition text comment '数据抽取的条件（除时间外）',
     page_no number(38, 0) comment '总页数',
     cost_time number(38, 0) comment '总用时',
-    extracted_result variant comment '抽取结果数据',
+    extracted_result varchar comment '抽取结果数据',
     is_proccessed boolean comment '是否已处理',
     is_success boolean comment '是否成功'
 ) comment = '数据抽取记录';
