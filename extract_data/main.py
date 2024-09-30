@@ -1,7 +1,7 @@
 # coding:utf-8
 from extract_data import extract_data
 from get_last_update_time import get_last_extract_time
-from config.config import snowflake_prd_config
+from config import snowflake_prd_config
 import datetime
 if __name__ == '__main__':
 

@@ -1,14 +1,10 @@
-from config.config import snowflake_prd_config
+from config import snowflake_prd_config
 from request_qince_api import Qince_API
 import datetime
 import time
 import json
 import pandas as pd
 from write_data import SaveData
-import re
-# var data = result.replace(/]"/g,"]").replace(/"\[/g,"[").replace(/\\"/g,'"')
-# python 使用正则表达式
-# import re
 
 
 def extract_data(**kwargs):
@@ -58,10 +54,6 @@ def extract_data(**kwargs):
         extract_end_timestamp = int(time.time())
         extract_end_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         extract_condition = json.dumps(request_body)
-        # result = res.get('response_data')
-        # result = re.sub(r'\]\"', ']', result)
-        # result = re.sub(r'\"\[', '[', result)
-        # result = re.sub(r'\\\"', '"', result)
         extract_result = dict(
             method=path,
             method_mode=method_mode,
