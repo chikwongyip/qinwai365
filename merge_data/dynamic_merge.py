@@ -8,14 +8,15 @@ def dynamic_merge(**kwargs):
     target_table_name = kwargs.get(
         'target_table_name')  # target_table_name: 目标表名称
     source_table_name = kwargs.get('source_table_name')
-    data = kwargs.get('data')  # data: 待合并的 Snowpark DataFrame
+    data = kwargs.get('data')  # data:dataframe
     keys = kwargs.get('keys')  # keys: 用于 join 的列名列表
 
+    df = session.create_dataframe(data)
     # 获取目标表的 Snowpark DataFrame
     target_table = session.table(target_table_name)
 
     # 列出待合并数据的所有列
-    data_columns = data.columns
+    data_columns = df.columns
     # print(data_columns)
     # 生成合并条件 (ON 条件)
     merge_condition = " AND ".join(
