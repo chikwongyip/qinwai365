@@ -99,6 +99,12 @@ def store(method, method_mode):
             from
                 ods.crm.ods_t_crm_extract_original_data,
                 lateral flatten(input => parse_json(extracted_result)) as data
+            qualify row_number() over(
+                partition by
+                    id
+                order by
+                    id
+                ) = 1
             where
                 is_proccessed = false
                 and method = '{0}'

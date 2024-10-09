@@ -8,9 +8,11 @@ def dynamic_merge(**kwargs):
     target_table_name = kwargs.get(
         'target_table_name')  # target_table_name: 目标表名称
     source_table_name = kwargs.get('source_table_name')
-    data = kwargs.get('data')  # data:dataframe
+    # data = kwargs.get('data')  # data:dataframe
     keys = kwargs.get('keys')  # keys: 用于 join 的列名列表
 
+    data_sql = "select * from {0} limit 1".format(target_table_name)
+    data = session.sql(data_sql).to_pandas()
     df = session.create_dataframe(data)
     # 获取目标表的 Snowpark DataFrame
     target_table = session.table(target_table_name)
