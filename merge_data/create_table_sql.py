@@ -99,16 +99,18 @@ def store(method, method_mode):
             from
                 ods.crm.ods_t_crm_extract_original_data,
                 lateral flatten(input => parse_json(extracted_result)) as data
-            qualify row_number() over(
-                partition by
-                    id
-                order by
-                    id
-                ) = 1
+       
             where
                 is_proccessed = false
                 and method = '{0}'
                 and method_mode = '{1}'
+            qualify
+                row_number() over (
+                    partition by
+                        value:id::string
+                    order by
+                        value:id::string
+                ) = 1
         );
         """.format(method, method_mode)
     return sql_string
@@ -131,6 +133,15 @@ def store_ext(method, method_mode):
                 is_proccessed = false
                 and method = '{0}'
                 and method_mode = '{1}'
+            qualify
+                row_number() over (
+                    partition by
+                        data.value['id']::string,
+                        exts.value['store_ext_column']::string
+                    order by
+                        data.value['id']::string,
+                        exts.value['store_ext_column']::string
+                ) = 1
         );
     """.format(method, method_mode)
     return sql_string
@@ -139,7 +150,7 @@ def store_ext(method, method_mode):
 def store_receiver(method, method_mode):
     sql_string = """
     create
-    or replace transient table ods.crm.ods_t_store_map_receiver_tmp as (
+    or replace transient table ods.crm.ods_t_store_map_receive_tmp as (
     select
         try_cast(data.value['id']::string as number) as id,
         data.value['store_id']::string as store_id,
@@ -155,6 +166,15 @@ def store_receiver(method, method_mode):
         is_proccessed = false
         and method = '{0}'
         and method_mode = '{1}'
+    qualify
+    row_number() over (
+        partition by
+            data.value['id']::string,
+            store_receive_info.value['store_waiqin_365_id']::string
+        order by
+            data.value['id']::string,
+            store_receive_info.value['store_waiqin_365_id']::string
+        ) = 1
     );
     """.format(method, method_mode)
     return sql_string
@@ -179,6 +199,120 @@ def store_dealers(method, method_mode):
             is_proccessed = false
             and method = '{0}'
             and method_mode = '{1}'
+        row_number() over (
+            partition by
+                data.value['id']::string,
+                dealers.value['waiqin365_dealer_id']::string
+            order by
+                data.value['id']::string,
+                dealers.value['waiqin365_dealer_id']::string
+        ) = 1
+    );
+    """.format(method, method_mode)
+    return sql_string
+
+
+def dealer_info(method, method_mode):
+    sql_string = """
+    create
+    or replace transient table ods.crm.ods_t_dealer_tmp as (
+        select
+            value:id::int as id,
+            value:dealer_id::string as dealer_id,
+            value:creator_waiqin_id::string as creator_waiqin_id,
+            value:creator_name::string as creator_name,
+            value:creator_id::string as creator_id,
+            value:return_pool_reason::string as return_pool_reason,
+            value:dealer_name::string as dealer_name,
+            value:dealer_code::string as dealer_code,
+            value:dealer_manager::string as dealer_manager,
+            value:dealer_manager_waiqin365_id::string as dealer_manager_waiqin365_id,
+            value:dealer_dept_id::string as dealer_dept_id,
+            value:dealer_dept_name::string as dealer_dept_name,
+            value:dealer_dept_waiqin365_id::string as dealer_dept_waiqin365_id,
+            value:dealer_district::string as dealer_district,
+            value:dealer_district_full_path::string as dealer_district_full_path,
+            value:dealer_district_waiqin365_id::string as dealer_district_waiqin365_id,
+            value:dealer_type::string as dealer_type,
+            value:dealer_type_code::string as dealer_type_code,
+            value:dealer_type_id::string as dealer_type_id,
+            value:dealer_mss_province::string as dealer_mss_province,
+            value:dealer_mss_province_code::string as dealer_mss_province_code,
+            value:dealer_mss_city::string as dealer_mss_city,
+            value:dealer_mss_city_code::string as dealer_mss_city_code,
+            value:dealer_mss_area::string as dealer_mss_area,
+            value:dealer_mss_dept_id::string as dealer_mss_dept_id,
+            value:dealer_mss_dept_waiqin365_id::string as dealer_mss_dept_waiqin365_id,
+            value:dealer_mss_dept_name::string as dealer_mss_dept_name,
+            value:dealer_mss_area_code::string as dealer_mss_area_code,
+            value:dealer_addr::string as dealer_addr,
+            value:dealer_delivery_addr::string as dealer_delivery_addr,
+            value:dealer_cooperate_status:string as dealer_cooperate_status,
+            value:upper_dealer::string as upper_dealer,
+            value:upper_dealer_id::string as upper_dealer_id,
+            nullif(value:waiqin365_upper_dealer_id, '')::int as waiqin365_upper_dealer_id,
+            value:dealer_source::string as dealer_source,
+            value:dealer_trade::string as dealer_trade,
+            value:dealer_scale::string as dealer_scale,
+            value:dealer_tel::string as dealer_tel,
+            value:dealer_fax::string as dealer_fax,
+            value:dealer_post::string as dealer_post,
+            value:dealer_remarks::string as dealer_remarks,
+            value:dealer_cooperate_status_id::int as dealer_cooperate_status_id,
+            value:dealer_level_id::string as dealer_level_id,
+            value:dealer_level::string as dealer_level,
+            value:tradingarea_level_name::string as tradingarea_level_name,
+            value:tradingarea_level_code::string as tradingarea_level_code,
+            value:dealer_approval_status::string as dealer_approval_status,
+            value:tradingarea::string as tradingarea,
+            value:create_time::string as create_time,
+            value:dealer_district_id::string as dealer_district_id,
+            value:dealer_district_code::string as dealer_district_code,
+            value:dealer_pictures::string as dealer_pictures,
+            value:dealer_district_create_time::string as dealer_district_create_time,
+            value:dealer_district_modify_time::string as dealer_district_modify_time,
+            value:dealer_district_creator_name::string as dealer_district_creator_name,
+            value:dealer_district_modifyier_name::string as dealer_district_modifyier_name,
+            value:dealer_district_status::string as dealer_district_status,
+            value:dealer_mss_street::string as dealer_mss_street,
+            value:dealer_mss_street_code::string as dealer_mss_street_code,
+            value:dealer_label::string as dealer_label,
+            value:dealer_label_id::string as dealer_label_id,
+            value:dealer_assistant_id::string as dealer_assistant_id,
+            value:dealer_liscence::string as dealer_liscence,
+            value:dealer_assistant_name::string as dealer_assistant_name,
+            value:dealer_road_msg::string as dealer_road_msg,
+            value:dealer_house_number::string as dealer_house_number,
+            value:dealer_liscence_name::string as dealer_liscence_name,
+            value:dealer_registration_no::string as dealer_registration_no,
+            value:dealer_credit_no::string as dealer_credit_no,
+            value:dealer_registration_date::string as dealer_registration_date,
+            value:dealer_operator::string as dealer_operator,
+            value:dealer_sale_direct::string as dealer_sale_direct,
+            value:dealer_creator_code::string as dealer_creator_code,
+            value:dealer_modifier_code::string as dealer_modifier_code,
+            value:dealer_manager_code::string as dealer_manager_code,
+            value:dealer_status::string as dealer_status,
+            value:exts::string as variant,
+            value:linkmans::string as linkmans,
+            value:deliverys::string as deliverys,
+            value:stores::string as stores,
+            value:dealer_receive_info::string as dealer_receive_info,
+            value:tradingarea_big::string as tradingarea_big,
+            value:dealer_third_district_id::string as dealer_third_district_id
+        from
+            ods.crm.ods_t_crm_extract_original_data,
+            lateral flatten(input => parse_json(extracted_result)) as data,
+        where
+            method = '{0}'
+            and method_mode = '{1}'
+        qualify
+            row_number() over (
+                partition by
+                    value:id::int
+                order by
+                    value:id::int
+            ) = 1
     );
     """.format(method, method_mode)
     return sql_string
