@@ -19,7 +19,7 @@ if __name__ == '__main__':
     session.sql(dealer_sql).collect()
     dynamic_merge(session=session, target_table_name='ODS.CRM.ODS_T_DEALER',
                   source_table_name='ODS.CRM.ODS_T_DEALER_TMP', keys=['ID'])
-    print('更新门店数据完成')
+    print('更新经销商数据完成')
     t = session.table("ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
     t.update(
         {"IS_PROCCESSED": True},
