@@ -199,6 +199,7 @@ def store_dealers(method, method_mode):
             is_proccessed = false
             and method = '{0}'
             and method_mode = '{1}'
+       qualify
         row_number() over (
             partition by
                 data.value['id']::string,

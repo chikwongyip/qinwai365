@@ -27,11 +27,15 @@ if __name__ == '__main__':
                   source_table_name='ODS.CRM.ODS_T_STORE_EXTS_TMP', keys=['ID', 'STORE_EXT_COLUMN'])
     print('更新门店扩展数据完成')
 
+    print('更新门店收货信息ODS.CRM.ODS_T_STORE_MAP_RECEIVE_INFO')
     store_receiver_sql = store_receiver(method=method, method_mode=method_mode)
     session.sql(store_receiver_sql).collect()
     dynamic_merge(session=session, target_table_name='ODS.CRM.ODS_T_STORE_MAP_RECEIVE_INFO',
-                  source_table_name='ODS.CRM.ODS_T_STORE_MAP_RECEIVE_INFO_TMP', keys=['ID', 'DEALER_ID'])
+                  source_table_name='ODS.CRM.ODS_T_STORE_MAP_RECEIVE_INFO_TMP', keys=['ID', 'STORE_WAIQIN_365_ID'])
 
+    print('更新门店收货信息完成')
+
+    print('更新门店经销商信息ODS.CRM.ODS_T_STORE_MAP_DEALER')
     store_dealers_sql = store_dealers(method=method, method_mode=method_mode)
     session.sql(store_dealers_sql).collect()
     dynamic_merge(session=session, target_table_name='ODS.CRM.ODS_T_STORE_MAP_DEALER',
@@ -44,4 +48,5 @@ if __name__ == '__main__':
         & (t["METHOD_MODE"] == method_mode)
         & (t["IS_PROCCESSED"] == False),
     )
+    print('更新门店经销商信息完成')
     session.close()
