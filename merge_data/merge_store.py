@@ -1,7 +1,8 @@
 # coding: utf-8
 
 from config import snowflake_prd_config
-from create_table_sql import store, store_dealers, store_ext, store_receiver
+from create_table_sql import store, store_dealers, store_ext, store_receiver, extract_order
+from update_extract_order import update_extract_order
 from create_session import create_session
 from dynamic_merge import dynamic_merge
 if __name__ == '__main__':
@@ -12,6 +13,11 @@ if __name__ == '__main__':
     # 创建一个snowflake session
     print("正在处理接口{0} - {1}".format(method, method_mode))
     session = create_session(snowflake_prd_config)
+
+    print('正在获取订单数据')
+    extract_sql = extract_order(method=method, method_mode=method_mode)
+    session.sql(extract_sql).collect()
+
     print('正在更新ODS.CRM.ODS_T_STORE')
     store_sql = store(method=method, method_mode=method_mode)
     # 执行创建临时表
@@ -41,12 +47,15 @@ if __name__ == '__main__':
     dynamic_merge(session=session, target_table_name='ODS.CRM.ODS_T_STORE_MAP_DEALER',
                   source_table_name='ODS.CRM.ODS_T_STORE_MAP_DEALER_TMP', keys=['ID', 'WAIQIN365_DEALER_ID'])
     # 更新json 记录表
-    t = session.table("ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
-    t.update(
-        {"IS_PROCCESSED": True},
-        (t["METHOD"] == method)
-        & (t["METHOD_MODE"] == method_mode)
-        & (t["IS_PROCCESSED"] == False),
-    )
+    # t = session.table("ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
+    # t.update(
+    #     {"IS_PROCCESSED": True},
+    #     (t["METHOD"] == method)
+    #     & (t["METHOD_MODE"] == method_mode)
+    #     & (t["IS_PROCCESSED"] == False),
+    # )
+    update_sql = update_extract_order(method=method, method_mode=method_mode)
+    res = session.sql(update_sql).collect()
+    print(res)
     print('更新门店经销商信息完成')
     session.close()
