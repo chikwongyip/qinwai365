@@ -44,17 +44,12 @@ if __name__ == '__main__':
     print('更新门店经销商信息ODS.CRM.ODS_T_STORE_MAP_DEALER')
     store_dealers_sql = store_dealers(method=method, method_mode=method_mode)
     session.sql(store_dealers_sql).collect()
+    # print(store_dealers_sql)
     dynamic_merge(session=session, target_table_name='ODS.CRM.ODS_T_STORE_MAP_DEALER',
                   source_table_name='ODS.CRM.ODS_T_STORE_MAP_DEALER_TMP', keys=['ID', 'WAIQIN365_DEALER_ID'])
     # 更新json 记录表
-    # t = session.table("ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
-    # t.update(
-    #     {"IS_PROCCESSED": True},
-    #     (t["METHOD"] == method)
-    #     & (t["METHOD_MODE"] == method_mode)
-    #     & (t["IS_PROCCESSED"] == False),
-    # )
     update_sql = update_extract_order(method=method, method_mode=method_mode)
+    # print(update_sql)
     res = session.sql(update_sql).collect()
     print(res)
     print('更新门店经销商信息完成')

@@ -10,6 +10,6 @@ def update_extract_order(method, method_mode):
         where
             data.extract_order = tmp.extract_order
             and data.method = '{0}'
-            and data.method_mode = {1};
+            and data.method_mode = '{1}';
     """.format(method, method_mode)
     return sql_string

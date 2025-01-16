@@ -209,7 +209,7 @@ def store_receiver(method, method_mode):
 def store_dealers(method, method_mode):
     sql_string = """
     create
-    or replace transient table ods.crm.ods_t_store_dealers_tmp as (
+    or replace transient table ods.crm.ods_t_store_map_dealer_tmp as (
         select
             try_cast(data.value['id']::string as number) as id,
             data.value['store_id']::string as store_id,
