@@ -17,8 +17,11 @@ def get_last_extract_time(config: dict, **kwargs):
         .fetchall()
     )
     conn.close()
-    return (
-        res[0][0]
-        if res
-        else datetime.datetime.strptime("2024-09-26 00:00:00", "%Y-%m-%d %H:%M:%S")
-    )
+    last_extract_time = res[0][0] if res else datetime.datetime.strptime(
+        "2024-09-26 00:00:00", "%Y-%m-%d %H:%M:%S")
+
+    # last_extract_time 减 10分钟
+    last_extract_time = last_extract_time - datetime.timedelta(minutes=10)
+
+    # last_extract_time 转字符串
+    return last_extract_time
