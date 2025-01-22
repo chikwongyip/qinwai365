@@ -129,7 +129,7 @@ def store(method, method_mode):
                 partition by
                     value:id::string
                 order by
-                    value:id::string
+                    value:store_modify_time::string desc
             ) = 1
         );
         """.format(method, method_mode)
@@ -162,8 +162,7 @@ def store_ext(method, method_mode):
                         data.value['id']::string,
                         exts.value['store_ext_column']::string
                     order by
-                        data.value['id']::string,
-                        exts.value['store_ext_column']::string
+                        data.value['store_modify_time']::string desc
                 ) = 1
         );
     """.format(method, method_mode)
@@ -198,8 +197,7 @@ def store_receiver(method, method_mode):
             data.value['id']::string,
             store_receive_info.value['store_waiqin_365_id']::string
         order by
-            data.value['id']::string,
-            store_receive_info.value['store_waiqin_365_id']::string
+            data.value['store_modify_time']::string desc
         ) = 1
     );
     """.format(method, method_mode)
@@ -234,8 +232,7 @@ def store_dealers(method, method_mode):
                 data.value['id']::string,
                 dealers.value['waiqin365_dealer_id']::string
             order by
-                data.value['id']::string,
-                dealers.value['waiqin365_dealer_id']::string
+                data.value['store_modify_time']::string desc
         ) = 1
     );
     """.format(method, method_mode)
