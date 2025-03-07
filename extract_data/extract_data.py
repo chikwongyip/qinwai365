@@ -18,11 +18,16 @@ def extract_data(**kwargs):
 
     # 设置请求参数
     request_body = dict(page_number=page_number)
-
-    if after_modify_date:
-        request_body['after_modify_date'] = after_modify_date
-    if before_modify_date:
-        request_body['before_modify_date'] = before_modify_date
+    if method_mode == 'CREATE':
+        if after_modify_date:
+            request_body['after_create_date'] = after_modify_date
+        if before_modify_date:
+            request_body['before_create_date'] = before_modify_date
+    else:
+        if after_modify_date:
+            request_body['after_modify_date'] = after_modify_date
+        if before_modify_date:
+            request_body['before_modify_date'] = before_modify_date
     # print(request_body)
     extract_start_timestamp = int(time.time())
     extract_start_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
