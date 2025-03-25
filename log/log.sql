@@ -29,15 +29,10 @@ from
 where
     qh.query_id = '01bad42e-3201-7b1c-0002-43c610e887e6';
 
--- 替换为实际 Query ID
-select
-    max(extract_order)
-from
-    ods.ecom.ods_t_ecom_extract_original_fixed_data;
-
+-- 替换为实际 Query IDSELECT query_text, completed_time
 select
     *
 from
-    ods.ecom.ods_t_ecom_extract_original_fixed_data
-where
-    extract_order = 997199;
+    snowflake.account_usage.task_history
+order by
+    completed_time DESC;

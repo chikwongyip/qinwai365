@@ -1,3 +1,4 @@
+sql_str = """
     SELECT concat(
                 '{"config": {"form_id": "6799631239040073070"}, "data": {"pt":',
                 OBJECT_CONSTRUCT(*)::text,
@@ -48,7 +49,7 @@
     ,
                     zeroifnull(a.total_no_of_chenlie_store) as "slfdf_2405010025" -- l.门店数
     ,
-                    zeroifnull(a.target_sales) as "slfdf_2405010026" -- m.目标
+                    zeroifnull(a.target_sales)::DECIMAL(20, 2) as "slfdf_2405010026" -- m.目标
     ,
                     zeroifnull(a.actual_sales) as "slfdf_2405010027" -- n.实际
     ,
@@ -90,5 +91,8 @@
     ,
                     sku_fenxiao_stores as "slfdf_2408210001" -- 货架分销合格店数
                 from ads.crm.ads_v_dsr_visit_result_report as a
-                WHERE a.update_time >= date_trunc(day, dateadd(day, -1, current_timestamp())); -- 
+                WHERE a.update_time >= date_trunc(day, dateadd(day, -1, current_timestamp())) -- 
                 -- AND a.l4_employee_name = '周娟娟'
+                
+            )
+"""
