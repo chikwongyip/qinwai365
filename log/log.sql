@@ -18,6 +18,7 @@ where
     and query_text LIKE '%ODS.CRM.ODS_T_STORE%'
     and start_time >= '2025-03-06 12:00:00'
     and query_type = 'TRUNCATE_TABLE'
+    and user_name = 'SYSTEM'
 order by
     start_time DESC;
 
