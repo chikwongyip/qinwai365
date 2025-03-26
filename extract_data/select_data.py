@@ -1,4 +1,4 @@
-sql_str = """
+select_mtd = """
     SELECT concat(
                 '{"config": {"form_id": "6799631239040073070"}, "data": {"pt":',
                 OBJECT_CONSTRUCT(*)::text,
@@ -96,3 +96,88 @@ sql_str = """
                 
             )
 """
+select_dsr = """
+    select
+        concat(
+            '{"config": {"form_id": "5207296376560712404"}, "data": {"pt":',
+            a::text,
+            '}}'
+        ) as body
+    from
+        (
+            select
+                object_construct(
+                    'slfdf_2405050008',
+                    IFF(
+                        corpid is null
+                        or corpid = '',
+                        emp_mobile,
+                        corpid
+                    ),
+                    'slfdf_2405050009',
+                    emp_name,
+                    'slfdf_2405050012',
+                    'DSR',
+                    'source_code',
+                    IFF(
+                        corpid is null
+                        or corpid = '',
+                        emp_mobile,
+                        corpid
+                    ),
+                    'creator_id',
+                    '7396865232005886403'
+                ) as a
+            from
+                ods.crm.ods_v_webcom_crm_org_combine_without_dealer_distinct
+            where
+                corpid = ''
+                -- WHERE emp_name in( ''马燕（陕甘宁）'',''刘忠华'')
+            
+        );
+"""
+
+
+def select_row(emp_name):
+    sql_str = """
+    select
+        IFF(
+            corpid is null
+            or corpid = '',
+            emp_mobile,
+            corpid
+        ) as "slfdf_2405050010",
+        emp_name as "slfdf_2405050011"
+    from
+        ods.crm.ods_v_webcom_crm_org_combine_without_dealer_distinct
+    where
+        corpid = ''
+    and l4_employee_id = '{0}';
+    """.format(emp_name)
+    return sql_str
+
+
+def select_hh():
+    sql_str = """
+    select distinct
+        l4_employee_id,
+        object_construct(
+            'slfdf_2405050008',
+            l4_employee_id,
+            'slfdf_2405050009',
+            l4_employee_name,
+            'slfdf_2405050012',
+            'HH主管',
+            'source_code',
+            l4_employee_id,
+            'creator_id',
+            '7396865232005886403'
+        ) as header
+    from
+        ods.crm.ods_v_webcom_crm_org_combine_without_dealer_distinct
+    where
+        l4_employee_id is not null
+    
+   ;
+    """
+    return sql_str
