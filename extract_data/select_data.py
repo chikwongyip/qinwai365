@@ -90,6 +90,8 @@ select_mtd = """
                     zeroifnull(a.total_visited_times) as "slfdf_2405090001" -- 成功拜访次数
     ,
                     sku_fenxiao_stores as "slfdf_2408210001" -- 货架分销合格店数
+    ,
+                    zeroifnull(a.actual_sales_weighted) as "slfdf_2408260001" -- n.实际加权  
                 from ads.crm.ads_v_dsr_visit_result_report as a
                 WHERE a.update_time >= date_trunc(day, dateadd(day, -1, current_timestamp())) -- 
                 -- AND a.l4_employee_name = '周娟娟'
