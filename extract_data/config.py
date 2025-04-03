@@ -15,3 +15,9 @@ snowflake_prd_config = {
     "appkey": "DMVtcNFzbZgFqK03_Y"
 
 }
+
+function_list = {
+    "function_id": [
+        "8211559854567350881"
+    ]
+}
