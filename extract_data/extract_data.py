@@ -80,3 +80,81 @@ def extract_data(**kwargs):
             "ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
         print('第{0}页数据提取成功'.format(page_number))
         return True
+
+
+def extract_data_visit(**kwargs):
+
+    # 获取请求参数
+    path = kwargs.get('path')
+    method_mode = kwargs.get('method_mode')
+    page_number = kwargs.get('page_number')
+    start_date = kwargs.get('start_date')
+    end_date = kwargs.get('end_date')
+
+    # 设置请求参数
+    request_body = dict(page=page_number)
+
+    if method_mode == 'VISIT':
+        if start_date:
+            request_body['visit_start_date'] = start_date.split(' ')[0]
+        if end_date:
+            request_body['visit_end_date'] = end_date.split(' ')[0]
+    else:
+        if start_date:
+            request_body['approval_start_date'] = start_date.split(' ')[0]
+        if end_date:
+            request_body['approval_end_date'] = end_date.split(' ')[0]
+
+    request_body['rows'] = '900'
+
+    extract_start_timestamp = int(time.time())
+    extract_start_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(request_body)
+
+    res = Qince_API(path,
+                    snowflake_prd_config, request_body).request_data()
+    # print(res)
+    if res.get('response_data') == '[]':
+        print('第{0}页无数据'.format(page_number))
+        if end_date:
+            # 把before_modify_date转为timestamp
+            last_extract_timestamp = int(time.mktime(
+                time.strptime(end_date, "%Y-%m-%d %H:%M:%S")))
+
+            delta_result = dict(
+                method=path,
+                method_mode=method_mode,
+                last_extract_date=end_date,
+                last_extract_timestamp=last_extract_timestamp,
+            )
+            df_data = pd.DataFrame([delta_result])
+            # df.columns = df.columns.str.upper()
+            SaveData(config=snowflake_prd_config, data=df_data).insert_data(
+                "COMMON.UTILS.COMMON_T_CRM_DELTA_TABLE")
+
+        return False
+    else:
+        extract_end_timestamp = int(time.time())
+        extract_end_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        extract_condition = json.dumps(request_body)
+        extract_result = dict(
+            method=path,
+            method_mode=method_mode,
+            extract_start_timestamp=extract_start_timestamp,
+            extract_end_timestamp=extract_end_timestamp,
+            extract_start_date=extract_start_date,
+            extract_end_date=extract_end_date,
+            extract_condition=extract_condition,
+            page_no=request_body.get("page_number"),
+            cost_time=extract_end_timestamp - extract_start_timestamp,
+            extracted_result=res.get('response_data'),
+            is_proccessed=False,
+            is_success=True
+        )
+        df = pd.DataFrame([extract_result])
+        # 将df column 转换成大写
+        # df.columns = df.columns.str.upper()
+        SaveData(config=snowflake_prd_config, data=df).insert_data(
+            "ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
+        print('第{0}页数据提取成功'.format(page_number))
+        return True
