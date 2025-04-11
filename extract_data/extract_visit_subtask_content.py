@@ -1,3 +1,4 @@
+from get_last_update_time import get_last_extract_time
 from request_qince_api import Qince_API
 from create_session import create_session
 from config import snowflake_prd_config, function_list
@@ -113,7 +114,14 @@ class Extract_Subtaks_Content:
 
 
 if __name__ == '__main__':
+    last_extract_date = get_last_extract_time(config=snowflake_prd_config,
+                                              method='/api/cusVisit/v1/queryCusVisitDetail',
+                                              method_mode='VISIT')
+
+    last_extract_date_str = last_extract_date.strftime('%Y-%m-%d %H:%M:%S')
+    last_extract_date_str = last_extract_date.split(' ')[0]
 
     extract_handle = Extract_Subtaks_Content(
-        date_start='2023-10-01', config=snowflake_prd_config)
+        date_start=last_extract_date_str, config=snowflake_prd_config)
     extract_handle.extract_data()
+    data = []

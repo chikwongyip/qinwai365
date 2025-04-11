@@ -11,14 +11,14 @@ def get_last_extract_time(config: dict, **kwargs):
     res = (
         conn.cursor()
         .execute(
-            "select dateadd(day, -5, last_extract_date) as last_extract_date from common.utils.common_t_crm_delta_table where method = '{0}' and method_mode = '{1}' order by last_extract_date desc limit 1;".format(
+            "select dateadd(day, -1, last_extract_date) as last_extract_date from common.utils.common_t_crm_delta_table where method = '{0}' and method_mode = '{1}' order by last_extract_date desc limit 1;".format(
                 method, method_mode)
         )
         .fetchall()
     )
     conn.close()
     last_extract_time = res[0][0] if res else datetime.datetime.strptime(
-        "2024-09-26 00:00:00", "%Y-%m-%d %H:%M:%S")
+        "2025-4-10 00:00:00", "%Y-%m-%d %H:%M:%S")
 
     # last_extract_time 减 10分钟
     last_extract_time = last_extract_time - datetime.timedelta(minutes=10)
