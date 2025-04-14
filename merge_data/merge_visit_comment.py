@@ -1,7 +1,7 @@
 
 from config import snowflake_prd_config
 from create_table_sql import visit_comment
-
+from snowflake.snowpark.functions import col
 from create_session import create_session
 from dynamic_merge import dynamic_merge
 if __name__ == '__main__':
@@ -16,7 +16,15 @@ if __name__ == '__main__':
     df_data.drop_duplicates(
         subset=keys, inplace=True, keep='last')
     session.write_pandas(
-        df_data, table_name=target_table,  auto_create_table=True, overwrite=True, table_type="transient")
+        df_data, table_name=source_table,  auto_create_table=True, overwrite=True, table_type="transient")
 
     dynamic_merge(session=session, target_table_name=target_table,
                   source_table_name=source_table, keys=keys)
+
+    t = session.table("ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
+    condition = (col("IS_PROCCESSED") == "false") & (
+        col("METHOD") == method) & (col("METHOD_MODE") == method_mode)
+    t.update(
+        {"IS_PROCCESSED": True},
+        condition=condition,
+    )

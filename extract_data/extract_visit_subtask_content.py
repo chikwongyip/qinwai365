@@ -7,6 +7,9 @@ import json
 import datetime
 from create_table import CreateTable
 from dynamic_merge import dynamic_merge
+import numpy as np
+from snowflake.connector.pandas_tools import write_pandas
+import snowflake.connector
 PREFIX_TABLE_NAME = 'ODS.CRM.ODS_T_CRM_SUBTASK_CONTENT'
 
 
@@ -18,6 +21,12 @@ class Extract_Subtaks_Content:
         # self.page = 1
         self.rows = 1000
         self.session = create_session(config)
+        self.conn = self.create_snowflake_conn(config)
+
+    def create_snowflake_conn(self, config):
+
+        return snowflake.connector.connect(
+            user=config.get('user'), password=config.get('password'), account=config.get('account'))
 
     def get_function_list(self):
         query = """
@@ -112,16 +121,47 @@ class Extract_Subtaks_Content:
                     print('第{0}页数据获取失败'.format(page))
                     keep = False
 
+    def insert_data(self, data, table):
+        database, schema, table_name = table.split(".")
+        write_pandas(
+            conn=self.conn,
+            df=data,
+            overwrite=False,
+            table_name=table_name,
+            database=database,
+            schema=schema,
+        )
+
 
 if __name__ == '__main__':
+    method = '/api/cusVisit/v1/queryCusVisitDetail'
+    method_mode = 'VISIT'
     last_extract_date = get_last_extract_time(config=snowflake_prd_config,
                                               method='/api/cusVisit/v1/queryCusVisitDetail',
                                               method_mode='VISIT')
 
     last_extract_date_str = last_extract_date.strftime('%Y-%m-%d %H:%M:%S')
-    last_extract_date_str = last_extract_date.split(' ')[0]
-
+    last_extract_date_str = last_extract_date_str.split(' ')[0]
+    delta_extract_date_str = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    delta_extract_timestamp = datetime.datetime.today().timestamp()
     extract_handle = Extract_Subtaks_Content(
         date_start=last_extract_date_str, config=snowflake_prd_config)
     extract_handle.extract_data()
-    data = []
+    data = [method, method_mode, '', delta_extract_date_str,
+            int(delta_extract_timestamp), '', 0]
+    df_delta_data = pd.DataFrame(
+        np.array(
+            data
+        ).reshape(1, 7),
+        columns=[
+            "METHOD",
+            "METHOD_MODE",
+            "TOKEN",
+            "LAST_EXTRACT_DATE",
+            "LAST_EXTRACT_TIMESTAMP",
+            "EXTRACT_FUNCTION",
+            "COST_TIME",
+        ],
+    )
+    extract_handle.insert_data(
+        df_delta_data, 'COMMON.UTILS.COMMON_T_CRM_DELTA_TABLE')

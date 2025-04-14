@@ -82,8 +82,8 @@ where
     header.visit_id = '4761343198861095962';
 
 select
-    id
+    *
 from
-    ods.crm.ods_t_crm_visit_comment_record as header
-limit
-    100;
+    ods.crm.ods_t_crm_extract_original_data
+where
+    method = '/api/cusVisit/v1/queryVisitApprovalByRecord'
