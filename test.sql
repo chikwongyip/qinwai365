@@ -86,4 +86,11 @@ select
 from
     ods.crm.ods_t_crm_extract_original_data
 where
-    method = '/api/cusVisit/v1/queryVisitApprovalByRecord'
+    method = '/api/cusVisit/v1/queryVisitApprovalByRecord';
+
+select
+    *
+from
+    ods.crm.ods_t_crm_subtask_settings
+where
+    function_id = '6368264407306081949';

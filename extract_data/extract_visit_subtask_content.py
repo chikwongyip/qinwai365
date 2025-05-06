@@ -70,6 +70,7 @@ class Extract_Subtaks_Content:
     def extract_data(self):
 
         function_lists = self.get_function_list()
+        print(function_lists)
         for function_list in function_lists:
             page = 1
             function_id, table_name = function_list
@@ -103,6 +104,12 @@ class Extract_Subtaks_Content:
                         df_data['function_id'] = function_id
                         df_data.columns = [col.upper()
                                            for col in df_data.columns]
+                        snow_cols = self.get_column(full_table_name)
+                        # print(df_data)
+                        for col in snow_cols:
+                            if col not in df_data.columns:
+                                df_data[col] = ''
+                        # print(df_data)
                         # 合并数据前检查table 是否存在
                         if self.table_exists(full_table_name):
 
@@ -131,6 +138,14 @@ class Extract_Subtaks_Content:
             database=database,
             schema=schema,
         )
+
+    def get_column(self, full_table_name):
+        query = """
+                select *
+                from
+                    {0} limit 1;""".format(full_table_name)
+        res = self.session.sql(query).to_pandas()
+        return res.columns
 
 
 if __name__ == '__main__':
