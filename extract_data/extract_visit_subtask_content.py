@@ -34,7 +34,7 @@ class Extract_Subtaks_Content:
                     function_id,
                     table_name
                 from
-                    ods.crm.ods_t_crm_subtask_settings;"""
+                    ods.crm.ods_t_crm_subtask_settings where function_id = '6047436081669660232';"""
         res = self.session.sql(query).collect()
         return res
 
@@ -65,6 +65,7 @@ class Extract_Subtaks_Content:
         """
 
         result = self.session.sql(query).collect()
+        # print(result[0]['CNT'] > 0)
         return result[0]['CNT'] > 0
 
     def extract_data(self):
@@ -104,20 +105,21 @@ class Extract_Subtaks_Content:
                         df_data['function_id'] = function_id
                         df_data.columns = [col.upper()
                                            for col in df_data.columns]
-                        snow_cols = self.get_column(full_table_name)
-                        # print(df_data)
-                        for col in snow_cols:
-                            if col not in df_data.columns:
-                                df_data[col] = ''
+
                         # print(df_data)
                         # 合并数据前检查table 是否存在
                         if self.table_exists(full_table_name):
+                            snow_cols = self.get_column(full_table_name)
 
+                            for col in snow_cols:
+                                if col not in df_data.columns:
+                                    df_data[col] = ''
                             CreateTable(
                                 full_table_name_tmp).create_table(df_data)
                             dynamic_merge(session=self.session, target_table_name=full_table_name,
                                           source_table_name=full_table_name_tmp, keys=['CREATE_TIME', 'VISIT_IMPLEMENT_ID', 'FUNCTION_ID', 'ID'])
                         else:
+
                             CreateTable(full_table_name).create_table(df_data)
                         page += 1
 

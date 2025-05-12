@@ -91,6 +91,8 @@ where
 select
     *
 from
-    ods.crm.ods_t_crm_subtask_settings
+    ods.crm
 where
-    function_id = '6368264407306081949';
+    TABLE_NAME = 'EXAMPLE_TABLE';
+
+result[0] ['CNT'] > 0
