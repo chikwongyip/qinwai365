@@ -183,3 +183,14 @@ def select_hh():
    ;
     """
     return sql_str
+
+
+def select_sku():
+    sql_str = """
+        select
+            *
+        from
+            dwd.crm.dwd_v_crm_send_to_crm_json_list
+        ;
+    """
+    return sql_str

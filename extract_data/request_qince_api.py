@@ -33,7 +33,7 @@ class Qince_API:
     def request_data(self):
 
         api_url = self.make_api_url()
-        print(api_url)
+        # print(api_url)
         res = RequestHandler().post(api_url, data=self.body, headers=self.headers)
         if res.status_code == 200:
             return res.json()

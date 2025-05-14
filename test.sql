@@ -95,4 +95,12 @@ from
 where
     TABLE_NAME = 'EXAMPLE_TABLE';
 
-result[0] ['CNT'] > 0
+select
+    *
+from
+    dwd.crm.dwd_v_crm_send_to_crm_json_list;
+
+select
+    count(*)
+from
+    dwd.crm.dwd_v_crm_send_to_crm_json_list;
