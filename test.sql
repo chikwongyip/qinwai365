@@ -104,3 +104,15 @@ select
     count(*)
 from
     dwd.crm.dwd_v_crm_send_to_crm_json_list;
+
+select
+    last_extract_date
+from
+    common.utils.common_t_crm_delta_table
+where
+    method = '/api/cusVisit/v1/queryCusVisitDetail'
+    and method_mode = 'VISIT'
+order by
+    last_extract_date desc
+limit
+    1;

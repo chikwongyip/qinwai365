@@ -34,7 +34,7 @@ class Extract_Subtaks_Content:
                     function_id,
                     table_name
                 from
-                    ods.crm.ods_t_crm_subtask_settings where function_id = '6047436081669660232';"""
+                    ods.crm.ods_t_crm_subtask_settings;"""
         res = self.session.sql(query).collect()
         return res
 
@@ -71,7 +71,7 @@ class Extract_Subtaks_Content:
     def extract_data(self):
 
         function_lists = self.get_function_list()
-        print(function_lists)
+        # print(function_lists)
         for function_list in function_lists:
             page = 1
             function_id, table_name = function_list
@@ -91,7 +91,7 @@ class Extract_Subtaks_Content:
                     'page': page,
                     'rows': self.rows
                 }
-                print(request_param)
+                # print(request_param)
                 res = Qince_API('/api/cusVisit/v1/queryCusVisitDetail',
                                 snowflake_prd_config, request_param).request_data()
 
