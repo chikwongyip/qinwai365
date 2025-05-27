@@ -395,3 +395,79 @@ def visit_comment(method, method_mode):
             and is_proccessed = false;
     """.format(method, method_mode)
     return sql_string
+
+
+def task_comment(method, method_mode):
+    sql_str = """
+    select
+        split(res.method, '-') [1]::string as function_id,
+        value:id::string as id,
+        value:visit_id::string as visit_id,
+        value:visit_form_id::string as visit_form_id,
+        value:visit_data_id::string as visit_data_id,
+        value:extract_status::string as extract_status,
+        value:creator_name::string as creator_name,
+        value:create_time::string as create_time,
+        value:approver_name::string as approver_name,
+        value:approve_time::string as approve_time,
+        value:approve_status::string as approve_status,
+        value:approval_form_id::string as approval_form_id,
+        value:approval_data_id::string as approval_data_id
+    from
+        ods.crm.ods_t_crm_extract_original_data as res,
+        lateral flatten(input => parse_json(res.extracted_result)) as data
+    where
+        method like '{0}%'
+        and is_proccessed = false
+        and method_mode = '{1}'
+    """.format(method, method_mode)
+    return sql_str
+
+
+def update_task_comment(method, method_mode):
+    sql_str = """
+    update 
+        ods.crm.ods_t_crm_extract_original_data as res
+    set is_processed = true     
+    where
+        method like '{0}%'
+        and is_proccessed = false
+        and method_mode = {1}
+    """.format(method, method_mode)
+    return sql_str
+
+
+def form_config(method, method_mode):
+    sql_str = """
+    create
+    or replace transient table ods.crm.ods_t_crm_form_config as (
+        select
+            split(res.method, '-') [1]::string as form_id,
+            data.value['table_name']::string as table_name,
+            data.value['description']::string as table_desc,
+            columns.value['column_name']::string as column_name,
+            columns.value['description']::string as col_desc,
+            columns.value['type']::string as type,
+            columns.value['select_option']::string as select_option,
+            columns.value['sequence']::string as seq,
+        from
+            ods.crm.ods_t_crm_extract_original_data as res,
+            lateral flatten(input => parse_json(res.extracted_result)) as data,
+            lateral flatten(input => parse_json(data.value['columns'])) as columns
+        where
+            method like '{0}%'
+            and method_mode = '{1}'
+            and data.value['table_name'] is not null
+            and is_proccessed = false
+        qualify
+            row_number() over (
+                partition by
+                    split(res.method, '-') [1]::string,
+                    data.value['table_name']::string ,
+                    columns.value['column_name']::string 
+                order by
+                    split(res.method, '-') [1]::string
+            ) = 1
+    );
+    """.format(method, method_mode)
+    return sql_str

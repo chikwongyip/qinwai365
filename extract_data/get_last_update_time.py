@@ -18,7 +18,7 @@ def get_last_extract_time(config: dict, **kwargs):
     )
     conn.close()
     last_extract_time = res[0][0] if res else datetime.datetime.strptime(
-        "2025-4-10 00:00:00", "%Y-%m-%d %H:%M:%S")
+        "2024-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
 
     # last_extract_time 减 10分钟
     last_extract_time = last_extract_time - datetime.timedelta(minutes=10)
