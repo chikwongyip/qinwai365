@@ -16,7 +16,7 @@ def get_form_id(session):
 
 
 if __name__ == '__main__':
-    path = '/api/userDefined/v1/queryUserDefined/'
+    path = '/api/userDefined/v1/queryUserDefined'
     method_mode = 'CREATE'
     session = create_session(snowflake_prd_config)
     form_lists = get_form_id(session=session)

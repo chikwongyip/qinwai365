@@ -176,125 +176,137 @@ select
     value:pt::variant['modifyier_time'] as modifyier_time,
     value:pt::variant['create_time'] as create_time,
     value:pt::variant['modifyier_id'] as modifyier_id,
-    value:pt::variant['creator_id'] as creator_id,
-    value:pt::variant['create_time'],
-    value:pt::variant['create_time'],
-    value:pt::variant['create_time'],
+    value:pt::variant['creator_id'] as creator_id
 from
     ods.crm.ods_t_crm_extract_original_data as res,
     lateral flatten(input => parse_json(res.extracted_result)) as data
 where
-    method = '/api/userDefined/v1/queryUserDefined-7536223043262678236'
+    method like '/api/userDefined/v1/queryUserDefined%'
     and method_mode = 'CREATE'
-    and is_proccessed = false
-limit
-    100;
-
-select
-    split(res.method, '-') [1]::string as form_id,
-    data.value['table_name']::string as table_name,
-    data.value['description']::string as table_desc,
-    columns.value['column_name']::string as column_name,
-    columns.value['description']::string as col_desc,
-    columns.value['type']::string as type,
-    columns.value['select_option']::string as select_option,
-    columns.value['sequence']::string as seq,
-from
-    ods.crm.ods_t_crm_extract_original_data as res,
-    lateral flatten(input => parse_json(res.extracted_result)) as data,
-    lateral flatten(input => parse_json(data.value['columns'])) as columns
-where
-    method like '/api/userDefined/v1/getUserDefined%'
-    and method_mode = 'CREATE'
-    and data.value['table_name'] is not null
     and is_proccessed = false;
 
-create
-or replace transient table ods.crm.ods_t_crm_form_config as (
-    select
-        split(res.method, '-') [1]::string as form_id,
-        data.value['table_name']::string as table_name,
-        data.value['description']::string as table_desc,
-        columns.value['column_name']::string as column_name,
-        columns.value['description']::string as col_desc,
-        columns.value['type']::string as type,
-        columns.value['select_option']::string as select_option,
-        columns.value['sequence']::string as seq,
-    from
-        ods.crm.ods_t_crm_extract_original_data as res,
-        lateral flatten(input => parse_json(res.extracted_result)) as data,
-        lateral flatten(input => parse_json(data.value['columns'])) as columns
-    where
-        method like '/api/userDefined/v1/getUserDefined%'
-        and method_mode = 'CREATE'
-        and data.value['table_name'] is not null
-        and is_proccessed = false
-    qualify
-        row_number() over (
-            partition by
-                split(res.method, '-') [1]::string,
-                data.value['table_name']::string,
-                columns.value['column_name']::string
-            order by
-                split(res.method, '-') [1]::string
-        ) = 1
-);
-
-select
-    split(res.method, '-') [1]::string as form_id,
-    data.value['table_name']::string as table_name,
-    data.value['description']::string as table_desc,
-    columns.value['column_name']::string as column_name,
-    columns.value['description']::string as col_desc,
-    columns.value['type']::string as type,
-    columns.value['select_option']::string as select_option,
-    columns.value['sequence']::string as seq,
+-- select
+--     split(res.method, '-') [1]::string as form_id,
+--     data.value['table_name']::string as table_name,
+--     data.value['description']::string as table_desc,
+--     columns.value['column_name']::string as column_name,
+--     columns.value['description']::string as col_desc,
+--     columns.value['type']::string as type,
+--     columns.value['select_option']::string as select_option,
+--     columns.value['sequence']::string as seq,
+-- from
+--     ods.crm.ods_t_crm_extract_original_data as res,
+--     lateral flatten(input => parse_json(res.extracted_result)) as data,
+--     lateral flatten(input => parse_json(data.value['columns'])) as columns
+-- where
+--     method like '/api/userDefined/v1/getUserDefined%'
+--     and method_mode = 'CREATE'
+--     and data.value['table_name'] is not null
+--     and is_proccessed = false;
+-- create
+-- or replace transient table ods.crm.ods_t_crm_form_config as (
+--     select
+--         split(res.method, '-') [1]::string as form_id,
+--         data.value['table_name']::string as table_name,
+--         data.value['description']::string as table_desc,
+--         columns.value['column_name']::string as column_name,
+--         columns.value['description']::string as col_desc,
+--         columns.value['type']::string as type,
+--         columns.value['select_option']::string as select_option,
+--         columns.value['sequence']::string as seq,
+--     from
+--         ods.crm.ods_t_crm_extract_original_data as res,
+--         lateral flatten(input => parse_json(res.extracted_result)) as data,
+--         lateral flatten(input => parse_json(data.value['columns'])) as columns
+--     where
+--         method like '/api/userDefined/v1/getUserDefined%'
+--         and method_mode = 'CREATE'
+--         and data.value['table_name'] is not null
+--         and is_proccessed = false
+--     qualify
+--         row_number() over (
+--             partition by
+--                 split(res.method, '-') [1]::string,
+--                 data.value['table_name']::string,
+--                 columns.value['column_name']::string
+--             order by
+--                 split(res.method, '-') [1]::string
+--         ) = 1
+-- );
+-- select
+--     split(res.method, '-') [1]::string as form_id,
+--     data.value['table_name']::string as table_name,
+--     data.value['description']::string as table_desc,
+--     columns.value['column_name']::string as column_name,
+--     columns.value['description']::string as col_desc,
+--     columns.value['type']::string as type,
+--     columns.value['select_option']::string as select_option,
+--     columns.value['sequence']::string as seq,
+-- from
+--     ods.crm.ods_t_crm_extract_original_data as res,
+--     lateral flatten(input => parse_json(res.extracted_result)) as data,
+--     lateral flatten(input => parse_json(data.value['columns'])) as columns
+-- where
+--     method like '/api/userDefined/v1/getUserDefined%'
+--     and method_mode = 'CREATE'
+--     and data.value['table_name'] is not null
+--     and is_proccessed = false
+-- qualify
+--     row_number() over (
+--         partition by
+--             split(res.method, '-') [1]::string,
+--             data.value['table_name']::string,
+--             columns.value['column_name']::string
+--         order by
+--             split(res.method, '-') [1]::string
+--     ) = 1;
+select distinct
+    column_name
 from
-    ods.crm.ods_t_crm_extract_original_data as res,
-    lateral flatten(input => parse_json(res.extracted_result)) as data,
-    lateral flatten(input => parse_json(data.value['columns'])) as columns
+    ods.crm.ods_t_crm_form_config
 where
-    method like '/api/userDefined/v1/getUserDefined%'
-    and method_mode = 'CREATE'
-    and data.value['table_name'] is not null
-    and is_proccessed = false
-qualify
-    row_number() over (
-        partition by
-            split(res.method, '-') [1]::string,
-            data.value['table_name']::string,
-            columns.value['column_name']::string
-        order by
-            split(res.method, '-') [1]::string
-    ) = 1;
+    form_id = '4987433291867759797';
 
 select
-    split(res.method, '-') [1]::string as function_id,
-    value:id::string as id,
-    value:visit_id::string as visit_id,
-    value:visit_form_id::string as visit_form_id,
-    value:visit_data_id::string as visit_data_id,
-    value:extract_status::string as extract_status,
-    value:creator_name::string as creator_name,
-    value:create_time::string as create_time,
-    value:approver_name::string as approver_name,
-    value:approve_time::string as approve_time,
-    value:approve_status::string as approve_status,
-    value:approval_form_id::string as approval_form_id,
-    value:approval_data_id::string as approval_data_id
+    value:pt::variant['id'] as id,
+    value:pt::variant['source_code'] as source_code,
+    value:pt::variant['status'] as status,
+    value:pt::variant['modifyier_time'] as modifyier_time,
+    value:pt::variant['create_time'] as create_time,
+    value:pt::variant['modifyier_id'] as modifyier_id,
+    value:pt::variant['creator_id'] as creator_id
 from
     ods.crm.ods_t_crm_extract_original_data as res,
     lateral flatten(input => parse_json(res.extracted_result)) as data
 where
-    method like '/api/cusVisit/v1/getVisitRecordApprovalData%'
-    and is_proccessed = true
-    and method_mode = 'CREATE';
+    method like '/api/userDefined/v1/queryUserDefined%'
+    and method_mode = 'CREATE'
+    and is_proccessed = false;
+
+select
+    *
+from
+    ods.crm.ods_t_crm_extract_original_data
+where
+    method = '/api/userDefined/v1/queryUserDefined-4987433291867759797';
+
+-- delete from common.utils.common_t_crm_delta_table
+-- where
+--     method like '/api/userDefined/v1/queryUserDefined%';
+-- drop table ods.crm.ods_t_crm_form_data_slfdf_2412160005;
+select
+    *
+from
+    ods.crm.ods_t_crm_form_config
+where
+    table_name = 'slfdf_2412160005';
+
+select
+    *
+from
+    ods.crm.ods_t_crm_form_data_slfdf_2412160005;
 
 select
     *
 from
     ods.crm.ODS_T_CRM_TASK_COMMENT;
-
-delete from ods.crm.ods_t_crm_extract_original_data
-where
-    method like '/api/userDefined/v1/getUserDefined%';

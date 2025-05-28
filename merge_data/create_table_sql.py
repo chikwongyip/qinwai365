@@ -471,3 +471,37 @@ def form_config(method, method_mode):
     );
     """.format(method, method_mode)
     return sql_str
+
+
+def form_data(session, form_id, method, method_mode):
+    query_str = """
+        select distinct
+            column_name
+        from
+            ods.crm.ods_t_crm_form_config
+        where
+            form_id = '{0}';
+    """.format(form_id)
+    cols = session.sql(query_str).collect()
+    column_str = ''
+    for col in cols:
+        column_str += "value:pt::variant['{0}']::string as {0},".format(col[0])
+    sql_str = """
+        select
+            value:pt::variant['id']::string as id,
+            value:pt::variant['source_code']::string as source_code,
+            value:pt::variant['status']::string as status,
+            value:pt::variant['modifyier_time']::string as modifyier_time,
+            value:pt::variant['create_time']::string as create_time,
+            value:pt::variant['modifyier_id']::string as modifyier_id,
+            value:pt::variant['creator_id']::string as creator_id,
+            {0}
+        from
+            ods.crm.ods_t_crm_extract_original_data as res,
+            lateral flatten(input => parse_json(res.extracted_result)) as data
+        where
+            method = '{1}-{3}'
+            and method_mode = '{2}'
+            and is_proccessed = false
+        """.format(column_str, method, method_mode, form_id)
+    return sql_str
