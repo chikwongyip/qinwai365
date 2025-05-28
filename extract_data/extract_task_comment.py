@@ -22,6 +22,5 @@ if __name__ == '__main__':
     function_lists = get_function_list(session=session)
     for function_list in function_lists:
         function_id, table_name = function_list
-        # print(function_id)
         extract_handler(path='/api/cusVisit/v1/getVisitRecordApprovalData',
                         method_mode='CREATE', function_id=function_id)

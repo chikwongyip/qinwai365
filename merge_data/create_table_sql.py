@@ -455,16 +455,16 @@ def form_config(method, method_mode):
             lateral flatten(input => parse_json(res.extracted_result)) as data,
             lateral flatten(input => parse_json(data.value['columns'])) as columns
         where
-            method like '{0}%'
-            and method_mode = '{1}'
+            method like '/api/userDefined/v1/getUserDefined%'
+            and method_mode = 'CREATE'
             and data.value['table_name'] is not null
             and is_proccessed = false
         qualify
             row_number() over (
                 partition by
                     split(res.method, '-') [1]::string,
-                    data.value['table_name']::string ,
-                    columns.value['column_name']::string 
+                    data.value['table_name']::string,
+                    columns.value['column_name']::string
                 order by
                     split(res.method, '-') [1]::string
             ) = 1

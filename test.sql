@@ -203,36 +203,6 @@ where
 --     and method_mode = 'CREATE'
 --     and data.value['table_name'] is not null
 --     and is_proccessed = false;
--- create
--- or replace transient table ods.crm.ods_t_crm_form_config as (
---     select
---         split(res.method, '-') [1]::string as form_id,
---         data.value['table_name']::string as table_name,
---         data.value['description']::string as table_desc,
---         columns.value['column_name']::string as column_name,
---         columns.value['description']::string as col_desc,
---         columns.value['type']::string as type,
---         columns.value['select_option']::string as select_option,
---         columns.value['sequence']::string as seq,
---     from
---         ods.crm.ods_t_crm_extract_original_data as res,
---         lateral flatten(input => parse_json(res.extracted_result)) as data,
---         lateral flatten(input => parse_json(data.value['columns'])) as columns
---     where
---         method like '/api/userDefined/v1/getUserDefined%'
---         and method_mode = 'CREATE'
---         and data.value['table_name'] is not null
---         and is_proccessed = false
---     qualify
---         row_number() over (
---             partition by
---                 split(res.method, '-') [1]::string,
---                 data.value['table_name']::string,
---                 columns.value['column_name']::string
---             order by
---                 split(res.method, '-') [1]::string
---         ) = 1
--- );
 -- select
 --     split(res.method, '-') [1]::string as form_id,
 --     data.value['table_name']::string as table_name,
@@ -310,3 +280,73 @@ select
     *
 from
     ods.crm.ODS_T_CRM_TASK_COMMENT;
+
+--子任务记录
+select
+    *
+from
+    ODS.CRM.ODS_T_CRM_SUBTASK_SETTINGS;
+
+create
+or replace transient table ods.crm.ods_t_crm_form_config as (
+    select
+        split(res.method, '-') [1]::string as form_id,
+        data.value['table_name']::string as table_name,
+        data.value['description']::string as table_desc,
+        columns.value['column_name']::string as column_name,
+        columns.value['description']::string as col_desc,
+        columns.value['type']::string as type,
+        columns.value['select_option']::string as select_option,
+        columns.value['sequence']::string as seq,
+    from
+        ods.crm.ods_t_crm_extract_original_data as res,
+        lateral flatten(input => parse_json(res.extracted_result)) as data,
+        lateral flatten(input => parse_json(data.value['columns'])) as columns
+    where
+        method like '/api/userDefined/v1/getUserDefined%'
+        and method_mode = 'CREATE'
+        and data.value['table_name'] is not null
+        and is_proccessed = false
+    qualify
+        row_number() over (
+            partition by
+                split(res.method, '-') [1]::string,
+                data.value['table_name']::string,
+                columns.value['column_name']::string
+            order by
+                split(res.method, '-') [1]::string
+        ) = 1
+);
+
+select
+    split(res.method, '-') [1]::string as form_id,
+    data.value['table_name']::string as table_name,
+    data.value['description']::string as table_desc,
+    columns.value['column_name']::string as column_name,
+    columns.value['description']::string as col_desc,
+    columns.value['type']::string as type,
+    columns.value['select_option']::string as select_option,
+    columns.value['sequence']::string as seq,
+from
+    ods.crm.ods_t_crm_extract_original_data as res,
+    lateral flatten(input => parse_json(res.extracted_result)) as data,
+    lateral flatten(input => parse_json(data.value['columns'])) as columns
+where
+    method like '/api/userDefined/v1/getUserDefined%'
+    and method_mode = 'CREATE'
+    and data.value['table_name'] is not null
+    and is_proccessed = false
+qualify
+    row_number() over (
+        partition by
+            split(res.method, '-') [1]::string,
+            data.value['table_name']::string,
+            columns.value['column_name']::string
+        order by
+            split(res.method, '-') [1]::string
+    ) = 1;
+
+select
+    *
+from
+    ods.crm.ods_t_crm_form_config;
