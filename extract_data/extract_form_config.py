@@ -16,6 +16,7 @@ def get_form_id(session):
 
 
 if __name__ == '__main__':
+    print('正在获取表单配置')
     path = '/api/userDefined/v1/getUserDefined'
     method_mode = 'CREATE'
     session = create_session(snowflake_prd_config)

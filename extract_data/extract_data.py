@@ -241,4 +241,5 @@ def extract_data_form(**kwargs):
         # df.columns = df.columns.str.upper()
         SaveData(config=snowflake_prd_config, data=df).insert_data(
             "ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
+        print('获取表单配置完成！')
         return True

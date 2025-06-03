@@ -350,3 +350,12 @@ select
     *
 from
     ods.crm.ods_t_crm_form_config;
+
+select
+    max(create_time)
+from
+    ods.crm.ods_t_crm_subtask_content_slfdf_2503030006;
+
+delete from common.utils.common_t_crm_delta_table
+where
+    last_extract_date >= '2025-05-29 00:00:00';
