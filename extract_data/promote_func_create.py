@@ -3,12 +3,12 @@ from config import snowflake_prd_config
 
 if __name__ == '__main__':
     dict_data = {
-        "code": "TPM001",
-        "name": "TPM_TEST",
+        "code": "TPM003",
+        "name": "TPM_测试20250912",
         "planTypeName": "陈列活动",
         "description": "这是方案说明",
-        "startDate": "2025-09-05",
-        "endDate": "2025-09-15",
+        "startDate": "2025-09-11",
+        "endDate": "2025-09-20",
         "recordFormName": "陈列拍照",
         "visitExeFlag": "0",
         "recordAuditFormName": "陈列评价",
@@ -16,7 +16,7 @@ if __name__ == '__main__':
         "empCode": "365cs",
         "applyRangeDeptCode": "好来化工",
         "planItemMode": "1",
-        "itemNames": "端架陈列"
+        "itemNames": "端架陈列,海报DM,包柱,海报,堆头,货架陈列"
         # "itemCostStdList": [
         #     {
         #         "itemName": "端架陈列",

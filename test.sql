@@ -359,3 +359,19 @@ from
 delete from common.utils.common_t_crm_delta_table
 where
     last_extract_date >= '2025-05-29 00:00:00';
+
+select
+    *
+from
+    ods.crm.ods_t_crm_extract_original_data
+where
+    method = '/api/cuxiao/v1/queryRegularSale';
+
+select
+    *
+from
+    ods.pws.ods_t_pws_sales_data_log
+where
+    create_time > '2025-09-08 00:00:00'
+limit
+    100;

@@ -51,6 +51,14 @@ def extract_data(**kwargs):
                 request_body['approve_date_start'] = after_modify_date
             if before_modify_date:
                 request_body['approve_date_end'] = before_modify_date
+    elif path == '/api/cuxiao/v1/queryRegularSale':
+        request_body = dict(page_number=page_number)
+        if method_mode == 'CREATE':
+            request_body['create_start'] = after_modify_date
+            request_body['create_end'] = before_modify_date
+        else:
+            request_body['modify_start'] = after_modify_date
+            request_body['modify_end'] = before_modify_date
     else:
         request_body = dict(page_number=page_number)
         if method_mode == 'CREATE':
@@ -66,7 +74,7 @@ def extract_data(**kwargs):
         # print(request_body)
     extract_start_timestamp = int(time.time())
     extract_start_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
+    print(request_body)
     res = Qince_API(path,
                     snowflake_prd_config, request_body).request_data()
 
