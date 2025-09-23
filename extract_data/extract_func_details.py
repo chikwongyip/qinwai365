@@ -3,7 +3,7 @@ from config import snowflake_prd_config
 
 if __name__ == '__main__':
     dict_data = {
-        "activity_code": "TPM_FUNC_20250912_1"
+        "activity_code": "ZHHTMP001_09_23_01"
     }
     res = Qince_API('/api/cuxiao/v1/queryRegularSaleActivities',
                     snowflake_prd_config, dict_data).request_data()

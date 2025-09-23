@@ -3,16 +3,16 @@ from config import snowflake_prd_config
 
 if __name__ == '__main__':
     dict_data = {
-        "planCode": "TPM003",
+        "planCode": "ZHHTMP001",
         "projectApplyCode": "",
-        "activityCode": "TPM_FUNC_20250912_1",
+        "activityCode": "ZHHTMP001_09_23_01",
         "applicantCode": "365cs",
-        "applyName": "好来化工速销活动",
+        "applyName": "好来化工速销活动测试-0923",
 
         "subList": [{"cusCode": "POS024314",
 
-                     "startDate": "2025-10-02",
-                     "endDate": "2025-10-10",
+                     "startDate": "2025-10-01",
+                     "endDate": "2025-10-07",
                      "itemName": "端架陈列",
 
                      "budgetAmount": "10",
@@ -31,25 +31,25 @@ if __name__ == '__main__':
 
                          }]
     }
-    dict_data = {
-        "planCode": "TPM003",
-        "projectApplyCode": "",
-        "activityCode": "TPM_FUNC_20250912_2",
-        "applicantCode": "365cs",
-        "applyName": "好来化工速销活动",
+    # dict_data = {
+    #     "planCode": "TPM003",
+    #     "projectApplyCode": "",
+    #     "activityCode": "TPM_FUNC_20250912_2",
+    #     "applicantCode": "365cs",
+    #     "applyName": "好来化工速销活动",
 
-        "subList": [{"cusCode": "POS000002",
+    #     "subList": [{"cusCode": "POS000002",
 
-                     "startDate": "2025-10-02",
-                     "endDate": "2025-10-10",
-                     "itemName": "堆头",
+    #                  "startDate": "2025-10-02",
+    #                  "endDate": "2025-10-10",
+    #                  "itemName": "堆头",
 
-                     "budgetAmount": "10",
-                     "payMode": "",
-                     "remark": "hey man"
+    #                  "budgetAmount": "10",
+    #                  "payMode": "",
+    #                  "remark": "hey man"
 
-                     }]
-    }
+    #                  }]
+    # }
     res = Qince_API('/api/cuxiao/v1/addRegularActivity',
                     snowflake_prd_config, dict_data).request_data()
     print(res)

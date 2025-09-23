@@ -375,3 +375,69 @@ where
     create_time > '2025-09-08 00:00:00'
 limit
     100;
+
+select
+    *
+from
+    ods.ecom.ods_t_ecom_sale_material_list;
+
+select
+    page_no,
+    listagg("门店编码", ',') WITHIN group (
+        order by
+            rn DESC
+    ) as loop_str
+from
+    (
+        select
+            "门店编码",
+            row_number() over (
+                order by
+                    "门店编码"
+            ) as rn,
+            ceil(div0(rn, 1000)) as page_no
+        from
+            (
+                select
+                    store_code as "门店编码"
+                from
+                    ods.crm.ods_t_store
+                where
+                    store_status = '1'
+            )
+    )
+group by
+    1
+union all
+select
+    page_no,
+    listagg(DEALER_CODE, ',') WITHIN group (
+        order by
+            rn DESC
+    ) as loop_str
+from
+    (
+        select
+            DEALER_CODE,
+            row_number() over (
+                order by
+                    DEALER_CODE
+            ) as rn,
+            ceil(div0(rn, 1000)) as page_no
+        from
+            ODS.CRM.ODS_T_DEALER
+    )
+group by
+    1;
+
+select
+    dealer_code,
+    dealer_name,
+    dealer_status,
+    dealer_manager,
+    dealer_manager_code,
+    dealer_manager_waiqin365_id
+from
+    ods.crm.ods_t_dealer
+where
+    dealer_manager is not null;
