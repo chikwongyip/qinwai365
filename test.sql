@@ -431,13 +431,75 @@ group by
     1;
 
 select
-    dealer_code,
-    dealer_name,
-    dealer_status,
-    dealer_manager,
-    dealer_manager_code,
-    dealer_manager_waiqin365_id
+    a.dealer_code,
+    a.dealer_name,
+    -- a.dealer_status,
+    -- a.dealer_manager,
+    -- a.dealer_manager_code,
+    -- a.dealer_manager_waiqin365_id,
+    b.employee_code
+from
+    ods.crm.ods_t_dealer as a
+    inner join ods.crm.ods_t_crm_employee as b on a.dealer_manager_waiqin365_id = b.id
+where
+    a.DEALER_CODE <> '000000001'
+    and a.dealer_manager_waiqin365_id <> '';
+
+select
+    *
+from
+    ods.crm.ods_t_crm_employee
+limit
+    100;
+
+select
+    dealer_assistant_id
 from
     ods.crm.ods_t_dealer
 where
-    dealer_manager is not null;
+    id = '6818143917724176526';
+
+select
+    t.dealer_assistant_id,
+    s.value as id
+from
+    ods.crm.ods_t_dealer t
+    cross join table (SPLIT_TO_TABLE(t.dealer_assistant_id, ',')) s;
+
+select
+    a.dealer_code,
+    a.dealer_name,
+    b.value as dealer_manager_waiqin365_id
+from
+    ods.crm.ods_t_dealer as a
+    cross join table (
+        split_to_table(
+            concat(
+                a.dealer_manager_waiqin365_id,
+                ',',
+                a.dealer_assistant_id
+            ),
+            ','
+        )
+    ) as b
+where
+    dealer_assistant_id is not null
+union all
+select
+    a.dealer_code,
+    a.dealer_name,
+    a.dealer_manager_waiqin365_id
+from
+    ods.crm.ods_t_dealer as a
+where
+    dealer_assistant_id is null
+    and dealer_manager_waiqin365_id is not null;
+
+select
+    *
+from
+    ods.crm.ods_v_crm_dealer_relationship;
+
+alter user tpm_user
+set
+    TYPE = 'SERVICE';

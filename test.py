@@ -1,3 +1,4 @@
-# import sys
+import os
 
-# print(sys.path)
+current_directory = os.getcwd()
+print("当前目录:", current_directory)

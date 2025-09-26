@@ -11,13 +11,14 @@ class SaveData:
         self.data = data
         self.data.columns = self.data.columns.str.upper()
 
-    def insert_data(self, table):
+    def insert_data(self, table, overwrite=False, auto_create=False):
         database, schema, table_name = table.split(".")
         write_pandas(
             conn=self.conn,
             df=self.data,
-            overwrite=False,
+            overwrite=overwrite,
             table_name=table_name,
             database=database,
             schema=schema,
+            auto_create_table=auto_create
         )
