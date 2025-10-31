@@ -59,6 +59,14 @@ def extract_data(**kwargs):
         else:
             request_body['modify_start'] = after_modify_date
             request_body['modify_end'] = before_modify_date
+    elif path == '/api/cuxiao/v1/queryRegularSaleActivities':
+        request_body = dict(page_number=page_number)
+        if method_mode == 'CREATE':
+            request_body['create_date_begin'] = after_modify_date
+            request_body['create_date_end'] = before_modify_date
+        else:
+            request_body['modify_date_begin'] = after_modify_date
+            request_body['modify_date_end'] = before_modify_date
     elif path == '/api/employee/v3/queryEmployee':
         request_body = dict(page_number=page_number)
         if method_mode == 'CREATE':
