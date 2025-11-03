@@ -365,6 +365,26 @@ from
     lateral FLATTEN(input => PARSE_JSON(a.sub_list)) as sub_list;
 
 select
-    *
+    item.plan_code as activity_code,
+    item.plan_name as activity_name,
+    '' as activity_description,
+    item.cm_receive_id as store_id,
+    item.cm_receive_code as store_code,
+    item.cm_receive_name as store_name,
+    item.applicant_code as dsr_code,
+    item.applicant as dsr_name,
+    item.start_date as start_date,
+    item.end_date as end_date,
+    header.plan_type as promotion_activity_type,
+    header.form_id as activity_form,
+    item.exe_require as execution_requirements,
+    item.remark,
+    'BI_SYSTEM' as create_by,
+    'BI_SYSTEM' as update_by,
+    CURRENT_TIMESTAMP() as create_time,
+    item.update_time
 from
-    ods.crm.ods_v_crm_promotion_details;
+    ods.crm.ods_v_crm_promotion_details as item
+    inner join ods.crm.ods_t_crm_promotions as header on item.plan_id = header.id
+where
+    store_id <> '';

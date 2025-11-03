@@ -17,6 +17,7 @@ from create_session import create_session
 from create_dataframe import sql_select
 from dynamic_merge_data import dynamic_merge_data
 from create_table import CreateTable
+from datetime import datetime
 SQL_STR = """
 select
     -- Extract fields from the 'data' array inside the JSON response
@@ -63,6 +64,7 @@ if __name__ == '__main__':
     data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
     data_df.drop_duplicates(
         subset=keys, keep='last', inplace=True)
+    data_df['UPDATE_TIME'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     res = CreateTable(
         table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS').create_table(df=data_df)
 

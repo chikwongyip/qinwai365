@@ -31,6 +31,7 @@ select
     sub_list.value:dealerSourceCode::STRING as dealer_source_code,
     sub_list.value:dimInfoList::STRING as dim_info_list,
     sub_list.value:dimJson::STRING as dim_json,
+    sub_list.value:startDate::string as start_date,
     sub_list.value:endDate::STRING as end_date,
     sub_list.value:exeRequire::STRING as exe_require,
     sub_list.value:extColumns::STRING as item_ext_columns,
