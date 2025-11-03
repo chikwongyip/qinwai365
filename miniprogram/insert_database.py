@@ -48,9 +48,11 @@ if __name__ == '__main__':
     snowflake_session = create_session(snowflake_prd_config)
     engine = create_mysql_engine()
     sql_str = "select max(update_time ) as extract_time from weis.store_activity sa;"
-    last_extract_time = select_mysql_sql(egine=engine, mysql_str=sql_str)
-    if not last_extract_time[0][0]:
+    res = select_mysql_sql(egine=engine, mysql_str=sql_str)
+    if not res[0][0]:
         last_extract_time = '2025-11-01 14:00:00'
+    else:
+        last_extract_time = res[0][0]
 
     fetch_data_sql = """
         select
