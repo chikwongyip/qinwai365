@@ -9,7 +9,14 @@ def get_form_id(session):
         select distinct
             appraise_form_id
         from
-        ods.crm.ods_t_crm_visit_comment_record;
+            ods.crm.ods_t_crm_visit_comment_record
+        union all
+        select distinct
+            form_id
+        from
+            ods.crm.ods_t_crm_promotions
+        where
+            form_id <> '';
     """
     res = session.sql(query).collect()
     return res
@@ -25,5 +32,7 @@ if __name__ == '__main__':
         form_id = form_list[0]
         extract_handler(
             path=path, method_mode=method_mode, form_id=form_id)
+
+    # extract_handler(
     # extract_handler(
     #     path=path, method_mode=method_mode, form_id='7016725360500847213')

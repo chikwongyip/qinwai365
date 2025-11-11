@@ -69,8 +69,8 @@ def extract_handle_form_config(path, method_mode, form_id):
     return res
 
 
-if __name__ == '__main__':
-    path = '/api/userDefined/v1/getUserDefined'
-    method_mode = 'CREATE'
-    extract_handle_form_config(
-        path=path, method_mode=method_mode, form_id='7016725360500847213')
+# if __name__ == '__main__':
+#     path = '/api/userDefined/v1/getUserDefined'
+#     method_mode = 'CREATE'
+#     extract_handle_form_config(
+#         path=path, method_mode=method_mode, form_id='7016725360500847213')

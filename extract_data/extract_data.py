@@ -51,7 +51,7 @@ def extract_data(**kwargs):
                 request_body['approve_date_start'] = after_modify_date
             if before_modify_date:
                 request_body['approve_date_end'] = before_modify_date
-    elif path == '/api/cuxiao/v1/queryRegularSale':
+    elif path == '/api/cuxiao/v1/queryRegularSale' or path == '/api/cuxiao/v1/queryRegularReport':
         request_body = dict(page_number=page_number)
         if method_mode == 'CREATE':
             request_body['create_start'] = after_modify_date

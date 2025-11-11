@@ -59,35 +59,35 @@ where
 if __name__ == '__main__':
     # path = '/api/store/v1/queryStore'
     #     method_mode = 'MODIFY'
-    keys = ['ID']
-    session = create_session(snowflake_prd_config)
-    data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
-    data_df.drop_duplicates(
-        subset=keys, keep='last', inplace=True)
-    data_df['UPDATE_TIME'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    res = CreateTable(
-        table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS').create_table(df=data_df)
-
     # keys = ['ID']
-    # extract_handler(path='/api/cuxiao/v1/queryRegularSaleActivities',
-    #                 method_mode='CREATE')
-    # session = create_session()
+    # session = create_session(snowflake_prd_config)
     # data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
-    # if data_df.empty == False:
+    # data_df.drop_duplicates(
+    #     subset=keys, keep='last', inplace=True)
+    # data_df['UPDATE_TIME'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # res = CreateTable(
+    #     table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS').create_table(df=data_df)
 
-    #     data_df.drop_duplicates(
-    #         subset=keys, keep='last', inplace=True)
-    #     try:
-    #         source_df = session.create_dataframe(data_df)
-    #         dynamic_merge_data(
-    #             session=session,
-    #             source_df=data_df,
-    #             table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS',
-    #             merge_keys=keys
-    #         )
+    keys = ['ID']
+    extract_handler(path='/api/cuxiao/v1/queryRegularSaleActivities',
+                    method_mode='CREATE')
+    session = create_session()
+    data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
+    if data_df.empty == False:
 
-    #     except Exception as e:
-    #         print("merge table failed")
-    #     finally:
-    #         session.close()
-    # extract_handler(path='/api/store/v1/queryStore', method_mode='CREATE')
+        data_df.drop_duplicates(
+            subset=keys, keep='last', inplace=True)
+        try:
+            source_df = session.create_dataframe(data_df)
+            dynamic_merge_data(
+                session=session,
+                source_df=data_df,
+                table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS',
+                merge_keys=keys
+            )
+
+        except Exception as e:
+            print("merge table failed")
+        finally:
+            session.close()
+    

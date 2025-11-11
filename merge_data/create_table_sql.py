@@ -478,7 +478,7 @@ def form_data(session, form_id, method, method_mode):
         select distinct
             column_name
         from
-            ods.crm.ods_t_crm_form_config
+            ods.crm.ods_v_crm_form_config
         where
             form_id = '{0}';
     """.format(form_id)

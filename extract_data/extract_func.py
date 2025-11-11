@@ -1,16 +1,4 @@
-# from request_qince_api import Qince_API
-# from config import snowflake_prd_config
-
-# if __name__ == '__main__':
-#     dict_data = {
-#         "create_start": "2025-09-01 00:00:00",
-#         "create_end": "2025-09-11 00:00:00"
-#     }
-#     res = Qince_API('/api/cuxiao/v1/queryRegularSale',
-#                     snowflake_prd_config, dict_data).request_data()
-#     print(res)
-
-# coding: utf-8
+# coding:utf-8
 from config import snowflake_prd_config
 from extract_handler import extract_handler
 from create_session import create_session
@@ -51,23 +39,17 @@ where
     method = '/api/cuxiao/v1/queryRegularSale'
     and is_proccessed = false;
 """
-if __name__ == '__main__':
-    # path = '/api/store/v1/queryStore'
-    # method_mode = 'MODIFY'
-    # keys = ['ID']
-    # session = create_session(snowflake_prd_config)
-    # data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
-    # data_df.drop_duplicates(
-    #     subset=keys, keep='last', inplace=True)
-    # data_df['UPDATE_TIME'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # res = CreateTable(
-    #     table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS').create_table(df=data_df)
 
+
+def exec(meth_mode: str):
     keys = ['ID']
-    extract_handler(path='/api/cuxiao/v1/queryRegularSale',
-                    method_mode='CREATE')
-    session = create_session()
+    path = '/api/cuxiao/v1/queryRegularSale'
+    method_mode = meth_mode
+    extract_handler(path=path,
+                    method_mode=method_mode)
+    session = create_session(snowflake_prd_config)
     data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
+    # print(data_df)
     if data_df.empty == False:
 
         data_df.drop_duplicates(
@@ -77,7 +59,7 @@ if __name__ == '__main__':
             source_df = session.create_dataframe(data_df)
             dynamic_merge_data(
                 session=session,
-                source_df=data_df,
+                source_df=source_df,
                 table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS',
                 merge_keys=keys
             )
@@ -86,3 +68,10 @@ if __name__ == '__main__':
             print("merge table failed")
         finally:
             session.close()
+
+
+if __name__ == '__main__':
+
+    method_mode = ['CREATE', 'MODIFY']
+    for i in method_mode:
+        exec(i)

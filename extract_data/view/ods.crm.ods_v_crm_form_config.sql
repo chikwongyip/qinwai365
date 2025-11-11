@@ -1,0 +1,18 @@
+create or replace view ods.crm.ods_v_crm_form_config as
+select
+    form_id,
+    column_name
+from
+    ods.crm.ods_t_crm_form_config
+union all
+select
+    '7016725360500847213' as form_id,
+    'slfdf_2507240002_pic' as column_name
+union all
+select
+    '7016725360500847213' as form_id,
+    'creator_dept_id' as column_name
+union all
+select
+    '7016725360500847213' as form_id,
+    'creator_dept_name' as column_name;
