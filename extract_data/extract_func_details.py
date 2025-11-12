@@ -71,7 +71,7 @@ if __name__ == '__main__':
     keys = ['ID']
     extract_handler(path='/api/cuxiao/v1/queryRegularSaleActivities',
                     method_mode='CREATE')
-    session = create_session()
+    session = create_session(snowflake_prd_config)
     data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
     if data_df.empty == False:
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
             source_df = session.create_dataframe(data_df)
             dynamic_merge_data(
                 session=session,
-                source_df=data_df,
+                source_df=source_df,
                 table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS',
                 merge_keys=keys
             )
@@ -90,4 +90,3 @@ if __name__ == '__main__':
             print("merge table failed")
         finally:
             session.close()
-    

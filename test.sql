@@ -84,3 +84,10 @@ from
     ods.sensetime.ods_t_ai_pog_data
 limit
     100;
+
+select
+    *
+from
+    ods.crm.ods_v_crm_promotion_details
+where
+    cus_code = '9100002345';

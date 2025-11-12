@@ -3,34 +3,42 @@ from config import snowflake_prd_config
 
 if __name__ == '__main__':
     dict_data = {
-        "planCode": "ZHHTMP001",
+        "planCode": "HDHQ-20251111-000018",
         "projectApplyCode": "",
-        "activityCode": "ZHHTMP001_09_23_01",
-        "applicantCode": "365cs",
-        "applyName": "好来化工速销活动测试-0923",
-
-        "subList": [{"cusCode": "POS024314",
-
-                     "startDate": "2025-10-01",
-                     "endDate": "2025-10-07",
-                     "itemName": "端架陈列",
-
-                     "budgetAmount": "10",
-                     "payMode": "",
-                     "remark": "hey man"
-
-                     }, {"cusCode": "POS016818",
-
-                         "startDate": "2025-10-11",
-                         "endDate": "2025-10-25",
-                         "itemName": "海报DM",
-
-                         "budgetAmount": "20",
-                         "payMode": "",
-                         "remark": "TPM"
-
-                         }]
+        "activityCode": "HDHQ-20251111-000018-001_9100002345",
+        "applicantCode": "tpm_acct",
+        "applyName": "test二次陈列_HDHQ-20251111-000018-001_9100002345",
+        "subList": [
+            {
+                    "cusCode": "9100002345",
+                    "startDate": "2025-11-01",
+                    "endDate": "2025-12-31",
+                    "itemName": "挂网挂条",
+                    "budgetAmount": "1000.0000",
+                    "payMode": "",
+                    "remark": "测试"
+            },
+            {
+                "cusCode": "9100002345",
+                "startDate": "2025-11-01",
+                "endDate": "2025-12-31",
+                "itemName": "堆头",
+                "budgetAmount": "1000.0000",
+                "payMode": "",
+                "remark": "测试"
+            },
+            {
+                "cusCode": "9100002345",
+                "startDate": "2025-11-01",
+                "endDate": "2025-12-31",
+                "itemName": "端架陈列",
+                "budgetAmount": "1000.0000",
+                "payMode": "",
+                "remark": "测试"
+            }
+        ]
     }
+
     # dict_data = {
     #     "planCode": "TPM003",
     #     "projectApplyCode": "",
