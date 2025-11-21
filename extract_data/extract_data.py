@@ -5,9 +5,26 @@ import time
 import json
 import pandas as pd
 from write_data import SaveData
+from extract_strategies import get_strategy
 
 
-def extract_data(**kwargs):
+def extract_data(**kwargs) -> bool:
+    """
+    Extract data from Qince API based on provided parameters and save to Snowflake.
+
+    Args:
+        **kwargs: Arbitrary keyword arguments.
+            path (str): API endpoint path.
+            method_mode (str): 'CREATE' or 'MODIFY'.
+            page_number (int): Page number to fetch.
+            after_modify_date (str): Start date for modification/creation range.
+            before_modify_date (str): End date for modification/creation range.
+            form_id (str, optional): Form ID for user defined forms.
+            function_id (str, optional): Function ID for visit records.
+
+    Returns:
+        bool: True if data was extracted and saved, False if no data was found.
+    """
 
     # 获取请求参数
     path = kwargs.get('path')
@@ -18,76 +35,16 @@ def extract_data(**kwargs):
     form_id = kwargs.get('form_id')
     function_id = kwargs.get('function_id')
     method = path
+    method = path
     # 设置请求参数
-    if path == '/api/userDefined/v1/queryUserDefined':
-        request_body = dict(page=page_number)
-        request_body['rows'] = 1000
-        if form_id:
-            request_body['form_id'] = form_id
-            method = method + '-' + form_id
-        if method_mode == 'CREATE':
-            if after_modify_date:
-                request_body['date_start'] = after_modify_date
-            if before_modify_date:
-                request_body['date_end'] = before_modify_date
-        else:
-            if after_modify_date:
-                request_body['modify_date_start'] = after_modify_date
-            if before_modify_date:
-                request_body['modify_date_end'] = before_modify_date
-    elif path == '/api/cusVisit/v1/getVisitRecordApprovalData':
-        request_body = dict(page=page_number)
-        request_body['rows'] = 1000
-        if function_id:
-            request_body['function_id'] = function_id
-            method = method + '-' + function_id
-        if method_mode == 'CREATE':
-            if after_modify_date:
-                request_body['create_date_start'] = after_modify_date
-            if before_modify_date:
-                request_body['create_date_end'] = before_modify_date
-        else:
-            if after_modify_date:
-                request_body['approve_date_start'] = after_modify_date
-            if before_modify_date:
-                request_body['approve_date_end'] = before_modify_date
-    elif path == '/api/cuxiao/v1/queryRegularSale' or path == '/api/cuxiao/v1/queryRegularReport':
-        request_body = dict(page_number=page_number)
-        if method_mode == 'CREATE':
-            request_body['create_start'] = after_modify_date
-            request_body['create_end'] = before_modify_date
-        else:
-            request_body['modify_start'] = after_modify_date
-            request_body['modify_end'] = before_modify_date
-    elif path == '/api/cuxiao/v1/queryRegularSaleActivities':
-        request_body = dict(page_number=page_number)
-        if method_mode == 'CREATE':
-            request_body['create_date_begin'] = after_modify_date
-            request_body['create_date_end'] = before_modify_date
-        else:
-            request_body['modify_date_begin'] = after_modify_date
-            request_body['modify_date_end'] = before_modify_date
-    elif path == '/api/employee/v3/queryEmployee':
-        request_body = dict(page_number=page_number)
-        if method_mode == 'CREATE':
-            request_body['create_date'] = kwargs.get('create_date')
+    strategy = get_strategy(path)
+    request_body = strategy.construct_body(**kwargs)
 
-        else:
-            request_body['modify_date'] = kwargs.get('modify_date')
-
-    else:
-        request_body = dict(page_number=page_number)
-        if method_mode == 'CREATE':
-            if after_modify_date:
-                request_body['after_create_date'] = after_modify_date
-            if before_modify_date:
-                request_body['before_create_date'] = before_modify_date
-        else:
-            if after_modify_date:
-                request_body['after_modify_date'] = after_modify_date
-            if before_modify_date:
-                request_body['before_modify_date'] = before_modify_date
-        # print(request_body)
+    # Special handling for method name modification (preserved from original logic)
+    if path == '/api/userDefined/v1/queryUserDefined' and form_id:
+        method = method + '-' + form_id
+    elif path == '/api/cusVisit/v1/getVisitRecordApprovalData' and function_id:
+        method = method + '-' + function_id
     extract_start_timestamp = int(time.time())
     extract_start_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     # print(request_body)
@@ -145,7 +102,21 @@ def extract_data(**kwargs):
         return True
 
 
-def extract_data_visit(**kwargs):
+def extract_data_visit(**kwargs) -> bool:
+    """
+    Extract visit or approval data from Qince API.
+
+    Args:
+        **kwargs: Arbitrary keyword arguments.
+            path (str): API endpoint path.
+            method_mode (str): 'VISIT' or other modes.
+            page_number (int): Page number to fetch.
+            start_date (str): Start date for filtering.
+            end_date (str): End date for filtering.
+
+    Returns:
+        bool: True if data was extracted and saved, False if no data was found.
+    """
 
     # 获取请求参数
     path = kwargs.get('path')
@@ -223,7 +194,19 @@ def extract_data_visit(**kwargs):
         return True
 
 
-def extract_data_form(**kwargs):
+def extract_data_form(**kwargs) -> bool:
+    """
+    Extract form configuration data from Qince API.
+
+    Args:
+        **kwargs: Arbitrary keyword arguments.
+            path (str): API endpoint path.
+            method_mode (str): Method mode.
+            form_id (str): Form ID to fetch configuration for.
+
+    Returns:
+        bool: True if data was extracted and saved, False otherwise.
+    """
 
     # 获取请求参数
     path = kwargs.get('path')

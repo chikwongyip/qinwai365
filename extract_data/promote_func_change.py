@@ -3,14 +3,14 @@ from config import snowflake_prd_config
 
 if __name__ == '__main__':
     dict_data = {
-        "scene": "9",
-        "code": "TPM003",
-        "name": "测试放",
-        "description": "开始测试",
+        "scene": "1",
+        "code": "HDHQ-20251112-000006",
+        "name": "test二次陈列",
+        "description": "test二次陈列",
         "start_date": "2025-10-01",
-        "end_date": "2025-10-30",
-        "input_items": "端架陈列,海报DM,包柱,海报,堆头,货架陈列",
-        "emp_code": "365cs"
+        "end_date": "2025-12-31",
+        "input_items": "包柱,主货架陈列,堆头,挂网挂条,端架陈列",
+        "emp_code": "tpm_acct"
     }
 
     res = Qince_API('/api/cuxiao/v1/modifyPlan',

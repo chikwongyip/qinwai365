@@ -75,21 +75,14 @@ where
     method = '/api/cuxiao/v1/queryRegularReport';
 
 """
-if __name__ == '__main__':
-    path = '/api/cuxiao/v1/queryRegularReport'
-    method_mode = 'CREATE'
-    # keys = ['DATA_ID']
-    # session = create_session(snowflake_prd_config)
-    # data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
-    # data_df.drop_duplicates(
-    #     subset=keys, keep='last', inplace=True)
-    # data_df['UPDATE_TIME'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # res = CreateTable(
-    #     table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_COMMENT').create_table(df=data_df)
 
+
+def exec(method: str):
+    path = '/api/cuxiao/v1/queryRegularReport'
+    # method_mode = 'CREATE'
     keys = ['DATA_ID']
     extract_handler(path=path,
-                    method_mode=method_mode)
+                    method_mode=method)
     session = create_session(snowflake_prd_config)
     data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
     if data_df.empty == False:
@@ -101,7 +94,7 @@ if __name__ == '__main__':
             dynamic_merge_data(
                 session=session,
                 source_df=source_df,
-                table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS',
+                table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_COMMENT',
                 merge_keys=keys
             )
 
@@ -109,3 +102,42 @@ if __name__ == '__main__':
             print("merge table failed")
         finally:
             session.close()
+
+
+if __name__ == '__main__':
+    method_mode = ['CREATE', 'MODIFY']
+    for i in method_mode:
+        exec(i)
+    # path = '/api/cuxiao/v1/queryRegularReport'
+    # method_mode = 'CREATE'
+    # keys = ['DATA_ID']
+    # session = create_session(snowflake_prd_config)
+    # data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
+    # data_df.drop_duplicates(
+    #     subset=keys, keep='last', inplace=True)
+    # data_df['UPDATE_TIME'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # res = CreateTable(
+    #     table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_COMMENT').create_table(df=data_df)
+
+    # keys = ['DATA_ID']
+    # extract_handler(path=path,
+    #                 method_mode=method_mode)
+    # session = create_session(snowflake_prd_config)
+    # data_df = sql_select(snowflake_session=session, query_str=SQL_STR)
+    # if data_df.empty == False:
+
+    #     data_df.drop_duplicates(
+    #         subset=keys, keep='last', inplace=True)
+    #     try:
+    #         source_df = session.create_dataframe(data_df)
+    #         dynamic_merge_data(
+    #             session=session,
+    #             source_df=source_df,
+    #             table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS',
+    #             merge_keys=keys
+    #         )
+
+    #     except Exception as e:
+    #         print("merge table failed")
+    #     finally:
+    #         session.close()

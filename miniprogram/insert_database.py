@@ -53,7 +53,7 @@ if __name__ == '__main__':
         last_extract_time = '2025-11-01 14:00:00'
     else:
         last_extract_time = res[0][0]
-
+    print(last_extract_time)
     fetch_data_sql = """
         select
             item.plan_code as activity_code,
@@ -87,22 +87,22 @@ if __name__ == '__main__':
     # print(result.columns)
     column_type_mapping = {
         'id': BIGINT,
-        'activity_code': VARCHAR(50),
-        'activity_name': VARCHAR(100),
-        'activity_description': TEXT,
-        'store_id': VARCHAR(20),
-        'store_code': VARCHAR(50),
-        'store_name': VARCHAR(255),
-        'dsr_code': VARCHAR(50),
-        'dsr_name': VARCHAR(100),
+        'activity_code': VARCHAR(50, collation='utf8mb4_general_ci'),
+        'activity_name': VARCHAR(100, collation='utf8mb4_general_ci'),
+        'activity_description': TEXT(collation='utf8mb4_general_ci'),
+        'store_id': VARCHAR(20, collation='utf8mb4_general_ci'),
+        'store_code': VARCHAR(50, collation='utf8mb4_general_ci'),
+        'store_name': VARCHAR(255, collation='utf8mb4_general_ci'),
+        'dsr_code': VARCHAR(50, collation='utf8mb4_general_ci'),
+        'dsr_name': VARCHAR(100, collation='utf8mb4_general_ci'),
         'start_date': DATE,
         'end_date': DATE,
-        'promotion_activity_type': VARCHAR(100),
-        'activity_form': VARCHAR(100),
-        'execution_requirements': TEXT,
-        'remark': TEXT,
-        'create_by': VARCHAR(50),
-        'update_by': VARCHAR(50),
+        'promotion_activity_type': VARCHAR(100, collation='utf8mb4_general_ci'),
+        'activity_form': VARCHAR(100, collation='utf8mb4_general_ci'),
+        'execution_requirements': TEXT(collation='utf8mb4_general_ci'),
+        'remark': TEXT(collation='utf8mb4_general_ci'),
+        'create_by': VARCHAR(50, collation='utf8mb4_general_ci'),
+        'update_by': VARCHAR(50, collation='utf8mb4_general_ci'),
         'create_time': DATETIME,
         'update_time': DATETIME,
     }
@@ -117,33 +117,81 @@ if __name__ == '__main__':
     )
     print("数据写入成功，类型完全匹配！")
 
-    insert_mysql_str = """
-        INSERT INTO weis.store_activity 
-    (
-        activity_code, activity_name, activity_description, store_id, store_code, store_name,
-        dsr_code, dsr_name, start_date, end_date, promotion_activity_type, activity_form,
-        execution_requirements, remark, create_by, update_by, create_time, update_time
-    )
-    SELECT 
-        activity_code, activity_name, activity_description, store_id, store_code, store_name,
-        dsr_code, dsr_name, start_date, end_date, promotion_activity_type, activity_form,
-        execution_requirements, remark, create_by, update_by, create_time, update_time
-    FROM weis.store_activity_tmp AS tmp
-    ON DUPLICATE KEY UPDATE
-        activity_name = tmp.activity_name,
-        activity_description = tmp.activity_description,
-        store_code = tmp.store_code,
-        store_name = tmp.store_name,
-        dsr_code = tmp.dsr_code,
-        dsr_name = tmp.dsr_name,
-        start_date = tmp.start_date,
-        end_date = tmp.end_date,
-        promotion_activity_type = tmp.promotion_activity_type,
-        activity_form = tmp.activity_form,
-        execution_requirements = tmp.execution_requirements,
-        remark = tmp.remark,
-        update_by = tmp.update_by,
-        update_time = tmp.update_time;
+    # insert_mysql_str = """
+    #     INSERT INTO weis.store_activity
+    # (
+    #     activity_code, activity_name, activity_description, store_id, store_code, store_name,
+    #     dsr_code, dsr_name, start_date, end_date, promotion_activity_type, activity_form,
+    #     execution_requirements, remark, create_by, update_by, create_time, update_time
+    # )
+    # SELECT
+    #     activity_code, activity_name, activity_description, store_id, store_code, store_name,
+    #     dsr_code, dsr_name, start_date, end_date, promotion_activity_type, activity_form,
+    #     execution_requirements, remark, create_by, update_by, create_time, update_time
+    # FROM weis.store_activity_tmp AS tmp
+    # ON DUPLICATE KEY UPDATE
+    #     activity_name = tmp.activity_name,
+    #     activity_description = tmp.activity_description,
+    #     store_code = tmp.store_code,
+    #     store_name = tmp.store_name,
+    #     dsr_code = tmp.dsr_code,
+    #     dsr_name = tmp.dsr_name,
+    #     start_date = tmp.start_date,
+    #     end_date = tmp.end_date,
+    #     promotion_activity_type = tmp.promotion_activity_type,
+    #     activity_form = tmp.activity_form,
+    #     execution_requirements = tmp.execution_requirements,
+    #     remark = tmp.remark,
+    #     update_by = tmp.update_by,
+    #     update_time = tmp.update_time;
+    # """
+
+    # MySQL 模拟 Snowflake MERGE（根据 activity_code + store_id + store_code 任意匹配）
+    # 目标表：weis.store_activity
+    # 源表：   weis.store_activity_tmp
+
+    # 第一步：匹配上了就 UPDATE（包括更新 update_time）
+    update_sql = """
+        UPDATE weis.store_activity AS target
+            INNER JOIN weis.store_activity_tmp AS source
+            ON target.activity_code = source.activity_code
+            AND target.store_id      = source.store_id
+            AND target.store_code    = source.store_code
+            SET 
+                target.activity_name           = source.activity_name,
+                target.activity_description    = source.activity_description,
+                target.store_name              = source.store_name,
+                target.dsr_code                = source.dsr_code,
+                target.dsr_name                = source.dsr_name,
+                target.start_date              = source.start_date,
+                target.end_date                = source.end_date,
+                target.promotion_activity_type = source.promotion_activity_type,
+                target.activity_form           = source.activity_form,
+                target.execution_requirements  = source.execution_requirements,
+                target.remark                  = source.remark,
+                target.update_by               = source.update_by,
+                target.update_time             = source.update_time
     """
-    res = execute_sql(egine=engine, mysql_str=insert_mysql_str)
-    print(res)
+    insert_sql = """
+    INSERT INTO weis.store_activity 
+        (
+            activity_code, activity_name, activity_description, store_id, store_code, store_name,
+            dsr_code, dsr_name, start_date, end_date, promotion_activity_type, activity_form,
+            execution_requirements, remark, create_by, update_by, create_time, update_time
+        )
+        SELECT 
+            source.activity_code, source.activity_name, source.activity_description, source.store_id, 
+            source.store_code, source.store_name, source.dsr_code, source.dsr_name, source.start_date, 
+            source.end_date, source.promotion_activity_type, source.activity_form,
+            source.execution_requirements, source.remark, source.create_by, source.update_by, 
+            source.create_time, source.update_time
+        FROM weis.store_activity_tmp AS source
+        LEFT JOIN weis.store_activity AS target
+            ON target.activity_code = source.activity_code
+            AND target.store_id      = source.store_id
+            AND target.store_code    = source.store_code
+        WHERE target.activity_code IS NULL;
+    """
+    res = execute_sql(egine=engine, mysql_str=update_sql)
+    res = execute_sql(egine=engine, mysql_str=insert_sql)
+    # print(res)
