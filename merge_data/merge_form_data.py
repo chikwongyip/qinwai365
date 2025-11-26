@@ -45,6 +45,7 @@ if __name__ == '__main__':
             table_name
         from
             ods.crm.ods_t_crm_form_config
+        
     """
     form_config = session.sql(query_str).collect()
     for forms in form_config:
@@ -57,6 +58,7 @@ if __name__ == '__main__':
         source_table = target_table+'_TMP'
         keys = ['ID']
         sql_str = form_data(session, form_id, method, method_mode)
+        # print(sql_str)
         df_data = session.sql(sql_str).to_pandas()
         df_data.drop_duplicates(
             subset=keys, inplace=True, keep='last')

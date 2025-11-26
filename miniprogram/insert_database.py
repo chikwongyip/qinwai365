@@ -50,18 +50,19 @@ if __name__ == '__main__':
     sql_str = "select max(update_time ) as extract_time from weis.store_activity sa;"
     res = select_mysql_sql(egine=engine, mysql_str=sql_str)
     if not res[0][0]:
-        last_extract_time = '2025-11-01 14:00:00'
+        last_extract_time = '2025-10-01 14:00:00'
     else:
         last_extract_time = res[0][0]
+    # last_extract_time = '2025-10-01 14:00:00'
     print(last_extract_time)
     fetch_data_sql = """
         select
             item.plan_code as activity_code,
             item.plan_name as activity_name,
             '' as activity_description,
-            item.cm_receive_id as store_id,
-            item.cm_receive_code as store_code,
-            item.cm_receive_name as store_name,
+            item.cus_id as store_id,
+            item.cus_Code as store_code,
+            item.cus_name as store_name,
             item.applicant_code as dsr_code,
             item.applicant as dsr_name,
             item.start_date as start_date,
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     result.columns = [i.lower() for i in result.columns]
     # print(result.columns)
     column_type_mapping = {
-        'id': BIGINT,
+
         'activity_code': VARCHAR(50, collation='utf8mb4_general_ci'),
         'activity_name': VARCHAR(100, collation='utf8mb4_general_ci'),
         'activity_description': TEXT(collation='utf8mb4_general_ci'),
@@ -112,6 +113,7 @@ if __name__ == '__main__':
         name='store_activity_tmp',
         con=engine,
         if_exists='replace',
+
         index=False,
         dtype=column_type_mapping  # 关键！指定类型
     )

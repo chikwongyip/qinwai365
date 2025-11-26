@@ -178,4 +178,8 @@ where
 order by
     last_extract_date desc;
 
-call API.SENSETIME.P_MERGE_AI_DATA ('shelfRecognize');
+select distinct
+    form_id,
+    table_name
+from
+    ods.crm.ods_v_crm_form_config
