@@ -182,4 +182,18 @@ select distinct
     form_id,
     table_name
 from
-    ods.crm.ods_v_crm_form_config
+    ods.crm.ods_v_crm_form_config;
+
+select
+    *
+from
+    ODS.ECOM.ODS_V_ECOM_SALES_MATERIAL_LIST
+where
+    salesmaterial = 'hkju-04061093'
+limit
+    100;
+
+select
+    *
+from
+    api.tpm.api_v_tpm_sale_material;

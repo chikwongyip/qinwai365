@@ -108,6 +108,6 @@ def exec(method: str):
 
 
 if __name__ == '__main__':
-    method_mode = ['CREATE', 'MODIFY']
+    method_mode = ['CREATE', 'MODIFY', 'RE_MODIFY']
     for i in method_mode:
         exec(i)

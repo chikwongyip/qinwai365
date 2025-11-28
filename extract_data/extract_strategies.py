@@ -110,6 +110,26 @@ class RegularSaleStrategy(RequestStrategy):
         return request_body
 
 
+class RegularCommentStrategy(RequestStrategy):
+    def construct_body(self, **kwargs) -> Dict[str, Any]:
+        page_number = kwargs.get('page_number')
+        method_mode = kwargs.get('method_mode')
+        after_modify_date = kwargs.get('after_modify_date')
+        before_modify_date = kwargs.get('before_modify_date')
+
+        request_body = dict(page_number=page_number)
+        if method_mode == 'CREATE':
+            request_body['create_start'] = after_modify_date
+            request_body['create_end'] = before_modify_date
+        elif method_mode == 'MODIFY':
+            request_body['comment_time_start'] = after_modify_date
+            request_body['comment_time_end'] = before_modify_date
+        else:
+            request_body['re_comment_time_start'] = after_modify_date
+            request_body['re_comment_time_end'] = before_modify_date
+        return request_body
+
+
 class RegularSaleActivitiesStrategy(RequestStrategy):
     def construct_body(self, **kwargs) -> Dict[str, Any]:
         page_number = kwargs.get('page_number')
@@ -177,7 +197,7 @@ STRATEGY_MAP = {
     '/api/userDefined/v1/queryUserDefined': UserDefinedStrategy(),
     '/api/cusVisit/v1/getVisitRecordApprovalData': VisitRecordApprovalStrategy(),
     '/api/cuxiao/v1/queryRegularSale': RegularSaleStrategy(),
-    '/api/cuxiao/v1/queryRegularReport': RegularSaleStrategy(),
+    '/api/cuxiao/v1/queryRegularReport': RegularCommentStrategy(),
     '/api/cuxiao/v1/queryRegularSaleActivities': RegularSaleActivitiesStrategy(),
     '/api/employee/v3/queryEmployee': EmployeeStrategy(),
 }
