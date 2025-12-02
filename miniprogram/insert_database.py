@@ -56,32 +56,41 @@ if __name__ == '__main__':
     # last_extract_time = '2025-10-01 14:00:00'
     print(last_extract_time)
     fetch_data_sql = """
-        select
-            item.plan_code as activity_code,
-            item.plan_name as activity_name,
-            '' as activity_description,
-            item.cus_id as store_id,
-            item.cus_Code as store_code,
-            item.cus_name as store_name,
-            item.applicant_code as dsr_code,
-            item.applicant as dsr_name,
-            item.start_date as start_date,
-            item.end_date as end_date,
-            header.plan_type as promotion_activity_type,
-            header.form_id as activity_form,
-            item.exe_require as execution_requirements,
-            item.remark,
-            'BI_SYSTEM' as create_by,
-            'BI_SYSTEM' as update_by,
-            CURRENT_TIMESTAMP() as create_time,
-            item.update_time
-        from
-            ods.crm.ods_v_crm_promotion_details as item
-            inner join ods.crm.ods_t_crm_promotions as header on item.plan_id = header.id
-        where
-            store_id <> ''
-            and item.update_time >= '{0}';
+    select
+        item.id,
+        item.plan_code as activity_code,
+        item.plan_name as activity_name,
+        header.description as activity_description,
+        item.cus_id as store_id,
+        item.cus_Code as store_code,
+        item.cus_name as store_name,
+        item.applicant_code as dsr_code,
+        item.applicant as dsr_name,
+        item.start_date as start_date,
+        item.end_date as end_date,
+        header.plan_type as promotion_activity_type,
+        header.form_id as activity_form,
+        item.exe_require as execution_requirements,
+        item.remark ,
+        'BI_SYSTEM' as create_by,
+        'BI_SYSTEM' as update_by,
+        item.apply_code,
+        item.item_name,
+        CURRENT_TIMESTAMP() as create_time,
+        item.update_time,
+        activity_status,
+        item.item_status
+        
+    from
+        ods.crm.ods_v_crm_promotion_details as item
+        inner join ods.crm.ods_t_crm_promotions as header on item.plan_id = header.id
+    where
+        store_id <> ''
+        and item.plan_name <> 'null'
+            ;
     """.format(last_extract_time)
+    # and item.item_status = '1'
+    # and activity_status = '1'
     result = snowflake_session.sql(fetch_data_sql).to_pandas()
 
     result.columns = [i.lower() for i in result.columns]
@@ -104,11 +113,16 @@ if __name__ == '__main__':
         'remark': TEXT(collation='utf8mb4_general_ci'),
         'create_by': VARCHAR(50, collation='utf8mb4_general_ci'),
         'update_by': VARCHAR(50, collation='utf8mb4_general_ci'),
+        'apply_code': VARCHAR(100, collation='utf8mb4_general_ci'),
+        'item_name': VARCHAR(100, collation='utf8mb4_general_ci'),
         'create_time': DATETIME,
         'update_time': DATETIME,
+        'activity_status': VARCHAR(1, collation='utf8mb4_general_ci'),
+        'item_status': VARCHAR(1, collation='utf8mb4_general_ci'),
+        # 'apply_code': VARCHAR(255, collation='utf8mb4_general_ci'),
     }
     df_converted = convert_df_to_mysql_types(result, column_type_mapping)
-    print(df_converted)
+    # print(df_converted)
     df_converted.to_sql(
         name='store_activity_tmp',
         con=engine,
@@ -118,35 +132,6 @@ if __name__ == '__main__':
         dtype=column_type_mapping  # 关键！指定类型
     )
     print("数据写入成功，类型完全匹配！")
-
-    # insert_mysql_str = """
-    #     INSERT INTO weis.store_activity
-    # (
-    #     activity_code, activity_name, activity_description, store_id, store_code, store_name,
-    #     dsr_code, dsr_name, start_date, end_date, promotion_activity_type, activity_form,
-    #     execution_requirements, remark, create_by, update_by, create_time, update_time
-    # )
-    # SELECT
-    #     activity_code, activity_name, activity_description, store_id, store_code, store_name,
-    #     dsr_code, dsr_name, start_date, end_date, promotion_activity_type, activity_form,
-    #     execution_requirements, remark, create_by, update_by, create_time, update_time
-    # FROM weis.store_activity_tmp AS tmp
-    # ON DUPLICATE KEY UPDATE
-    #     activity_name = tmp.activity_name,
-    #     activity_description = tmp.activity_description,
-    #     store_code = tmp.store_code,
-    #     store_name = tmp.store_name,
-    #     dsr_code = tmp.dsr_code,
-    #     dsr_name = tmp.dsr_name,
-    #     start_date = tmp.start_date,
-    #     end_date = tmp.end_date,
-    #     promotion_activity_type = tmp.promotion_activity_type,
-    #     activity_form = tmp.activity_form,
-    #     execution_requirements = tmp.execution_requirements,
-    #     remark = tmp.remark,
-    #     update_by = tmp.update_by,
-    #     update_time = tmp.update_time;
-    # """
 
     # MySQL 模拟 Snowflake MERGE（根据 activity_code + store_id + store_code 任意匹配）
     # 目标表：weis.store_activity
@@ -158,7 +143,7 @@ if __name__ == '__main__':
             INNER JOIN weis.store_activity_tmp AS source
             ON target.activity_code = source.activity_code
             AND target.store_id      = source.store_id
-            AND target.store_code    = source.store_code
+            
             SET 
                 target.activity_name           = source.activity_name,
                 target.activity_description    = source.activity_description,
@@ -172,26 +157,33 @@ if __name__ == '__main__':
                 target.execution_requirements  = source.execution_requirements,
                 target.remark                  = source.remark,
                 target.update_by               = source.update_by,
-                target.update_time             = source.update_time
+                target.update_time             = source.update_time,
+                target.apply_code              = source.apply_code,
+                target.store_code              = source.store_code,
+                target.item_name               = source.item_name,
+                target.item_status             = source.item_status,
+                target.activity_status         = source.activity_status
     """
     insert_sql = """
     INSERT INTO weis.store_activity 
         (
             activity_code, activity_name, activity_description, store_id, store_code, store_name,
             dsr_code, dsr_name, start_date, end_date, promotion_activity_type, activity_form,
-            execution_requirements, remark, create_by, update_by, create_time, update_time
+            execution_requirements, remark, create_by, update_by, create_time, update_time,apply_code,item_name,
+            item_status,activity_status
         )
         SELECT 
             source.activity_code, source.activity_name, source.activity_description, source.store_id, 
             source.store_code, source.store_name, source.dsr_code, source.dsr_name, source.start_date, 
             source.end_date, source.promotion_activity_type, source.activity_form,
             source.execution_requirements, source.remark, source.create_by, source.update_by, 
-            source.create_time, source.update_time
+            source.create_time, source.update_time,source.apply_code,source.item_name,
+            source.item_status,source.activity_status
         FROM weis.store_activity_tmp AS source
         LEFT JOIN weis.store_activity AS target
             ON target.activity_code = source.activity_code
             AND target.store_id      = source.store_id
-            AND target.store_code    = source.store_code
+            
         WHERE target.activity_code IS NULL;
     """
     res = execute_sql(egine=engine, mysql_str=update_sql)
