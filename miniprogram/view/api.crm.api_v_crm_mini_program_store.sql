@@ -27,7 +27,7 @@ select
     "详细地址" as address,
     "合作状态" as cooperation_status,
     "所在好来地区" as darlie_area,
-    "经销商编码" as dealer_code,
+    iff(len("经销商编码") = 2, concat('D0', "经销商编码"), "经销商编码") as dealer_code,
     "经销商名称" as dealer_name,
     "门店分类" as store_category,
     "纬度" as latitude,
