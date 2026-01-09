@@ -5,7 +5,7 @@ import pandas as pd
 import time
 if __name__ == '__main__':
     dict_data = {
-        "cm_codes": "9102003831"
+        "cm_codes": "POS078677"
 
     }
     res = Qince_API('/api/customer/v1/queryCustomerLocation',
