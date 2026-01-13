@@ -86,8 +86,8 @@ if __name__ == '__main__':
         inner join ods.crm.ods_t_crm_promotions as header on item.plan_id = header.id
     where
         store_id <> ''
-        and item.plan_name <> 'null'
-            ;
+        and item_name <> '主货架陈列'
+        and item.update_time >= '{0}';
     """.format(last_extract_time)
     # and item.item_status = '1'
     # and activity_status = '1'
@@ -122,6 +122,7 @@ if __name__ == '__main__':
         # 'apply_code': VARCHAR(255, collation='utf8mb4_general_ci'),
     }
     df_converted = convert_df_to_mysql_types(result, column_type_mapping)
+
     # print(df_converted)
     df_converted.to_sql(
         name='store_activity_tmp',

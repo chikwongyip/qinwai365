@@ -1,5 +1,5 @@
 create or replace view api.crm.api_v_crm_mini_program_store as
-select
+select distinct
     "勤策门店ID" as store_id,
     "门店编码" as store_code,
     "门店名称" as store_name,
@@ -27,8 +27,11 @@ select
     "详细地址" as address,
     "合作状态" as cooperation_status,
     "所在好来地区" as darlie_area,
-    iff(len("经销商编码") = 2, concat('D0', "经销商编码"), "经销商编码") as dealer_code,
-    "经销商名称" as dealer_name,
+    "经销商编码",
+    -- iff(len("经销商编码") = 2, concat('D0', "经销商编码"), "经销商编码") as dealer_code,
+    -- "经销商名称" as dealer_name,
+    c.store_mapping_supplier_id as dealer_code,
+    c.customer_d_code_name as dealer_name,
     "门店分类" as store_category,
     "纬度" as latitude,
     "经度" as longitude,
@@ -52,6 +55,7 @@ select
 from
     ads.crm.ads_t_auto_route_customer_list a
     left join ods.crm.ods_t_store b on a."勤策门店ID" = b.id
+    left join dbt_model_db.prod.dim2_t_mdm_store_distinct c on a."门店编码" = c.store_id
 where
     a."合作状态" not in ('0', '4')
-    and "门店名称" not like '%作废%';
+    and a."门店名称" not like '%作废%';
