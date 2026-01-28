@@ -87,7 +87,7 @@ if __name__ == '__main__':
     where
         store_id <> ''
         and item_name <> '主货架陈列'
-        and item.update_time >= '{0}';
+        and item.update_time > '{0}';
     """.format(last_extract_time)
     # and item.item_status = '1'
     # and activity_status = '1'
@@ -144,6 +144,7 @@ if __name__ == '__main__':
             INNER JOIN weis.store_activity_tmp AS source
             ON target.activity_code = source.activity_code
             AND target.store_id      = source.store_id
+            and target.item_name    = source.item_name
             
             SET 
                 target.activity_name           = source.activity_name,

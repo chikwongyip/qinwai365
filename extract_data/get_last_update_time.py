@@ -11,7 +11,7 @@ def get_last_extract_time(config: dict, **kwargs):
     res = (
         conn.cursor()
         .execute(
-            "select dateadd(day, -1, last_extract_date) as last_extract_date from common.utils.common_t_crm_delta_table where method = '{0}' and method_mode = '{1}' order by last_extract_date desc limit 1;".format(
+            "select last_extract_date from common.utils.common_t_crm_delta_table where method = '{0}' and method_mode = '{1}' order by last_extract_date desc limit 1;".format(
                 method, method_mode)
         )
         .fetchall()
