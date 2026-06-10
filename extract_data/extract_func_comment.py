@@ -74,7 +74,7 @@ def get_sql_str(method: str):
 def exec(method: str):
     path = '/api/cuxiao/v1/queryRegularReport'
     # method_mode = 'CREATE'
-    keys = ['DATA_ID']
+    keys = ['ID', 'DATA_ID', 'CODE', 'ACTIVITY_CODE']
     extract_handler(path=path,
                     method_mode=method)
     session = create_session(snowflake_prd_config)
