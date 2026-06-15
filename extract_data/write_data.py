@@ -1,12 +1,13 @@
 # coding:utf-8
-import snowflake.connector
+
 from snowflake.connector.pandas_tools import write_pandas
+from create_session import create_conn
+# from config import snowflake_prd_config
 
 
 class SaveData:
     def __init__(self, config, data):
-        self.conn = snowflake.connector.connect(
-            user=config.get('user'), password=config.get('password'), account=config.get('account'))
+        self.conn = create_conn(config)
 
         self.data = data
         self.data.columns = self.data.columns.str.upper()
