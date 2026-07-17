@@ -2,12 +2,13 @@
 
 # coding: utf-8
 from config import snowflake_prd_config
-from extract_handler import extract_handler
+from extract_handler import extract_handler, extract_handler_new
 from create_session import create_session
 from create_dataframe import sql_select
 from dynamic_merge_data import dynamic_merge_data
 # from create_table import CreateTable
 from datetime import datetime
+import re
 
 
 def get_sql_str(method: str):
@@ -56,35 +57,59 @@ def get_sql_str(method: str):
 def exec(method: str):
     keys = ['ID']
     path = '/api/cuxiao/v1/queryRegularSaleActivities'
-    extract_handler(path=path,
-                    method_mode=method)
+    res = extract_handler_new(path=path,
+                              method_mode=method)
+    # print(res)
+    res = res.rename(columns=lambda x: re.sub(
+        r'(?<!^)(?=[A-Z])', '_', x).lower())
+    # res.to_csv('data.csv')
+    res.columns = res.columns.str.upper()
     session = create_session(snowflake_prd_config)
-    sql_str = get_sql_str(method=method)
-    data_df = sql_select(snowflake_session=session, query_str=sql_str)
-    if data_df.empty == False:
-
-        data_df.drop_duplicates(
+    # print(res)
+    if res.empty == False:
+        res.drop_duplicates(
             subset=keys, keep='last', inplace=True)
-        data_df['UPDATE_TIME'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        res['UPDATE_TIME'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         try:
-            source_df = session.create_dataframe(data_df)
+            source_df = session.create_dataframe(res)
             dynamic_merge_data(
                 session=session,
                 source_df=source_df,
                 table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS',
                 merge_keys=keys
             )
-            t = session.table("ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
-            t.update(
-                {"IS_PROCCESSED": True},
-                (t["METHOD"] == path)
-                & (t["IS_PROCCESSED"] == False)
-                & (t["METHOD_MODE"] == method),
-            )
+
         except Exception as e:
             print("merge table failed")
         finally:
             session.close()
+
+    # sql_str = get_sql_str(method=method)
+    # data_df = sql_select(snowflake_session=session, query_str=sql_str)
+    # if data_df.empty == False:
+
+    #     data_df.drop_duplicates(
+    #         subset=keys, keep='last', inplace=True)
+    #     data_df['UPDATE_TIME'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #     try:
+    #         source_df = session.create_dataframe(data_df)
+    #         dynamic_merge_data(
+    #             session=session,
+    #             source_df=source_df,
+    #             table_name='ODS.CRM.ODS_T_CRM_PROMOTIONS_DETAILS',
+    #             merge_keys=keys
+    #         )
+    #         t = session.table("ODS.CRM.ODS_T_CRM_EXTRACT_ORIGINAL_DATA")
+    #         t.update(
+    #             {"IS_PROCCESSED": True},
+    #             (t["METHOD"] == path)
+    #             & (t["IS_PROCCESSED"] == False)
+    #             & (t["METHOD_MODE"] == method),
+    #         )
+    #     except Exception as e:
+    #         print("merge table failed")
+    #     finally:
+    #         session.close()
 
 
 if __name__ == '__main__':
